@@ -1,3 +1,8 @@
+#data files
+*.csv
+*.xlsx
+*.dta
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
