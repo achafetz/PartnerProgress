@@ -3,7 +3,7 @@
 **   Aaron Chafetz & Josh Davis
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: JTD on June 28 2016
+**   Updated: 6/30/16
 
 /* NOTES
 	- Data source: ICPIFactView - SNU by IM Level_db-frozen_20160617 [Data Hub]
@@ -22,9 +22,9 @@
 *replace missing SNU prioritizatoins
 	replace snuprioritization="[not classified]" if snuprioritization==""
 
-*create new indicator variable for only ones of interest for analysis
-	* most indicators we just want their Total Numerator reported
-	* exceptions = HTC_TST, Positives & TX_CURR <1 --> need to "create"
+*create new indicator variable for only the ones of interest for analysis
+	* for most indicators we just want their Total Numerator reported
+	* exceptions = HTC_TST, Positives & TX_CURR <1 --> need to "create" new var
 	gen key_ind=indicator if (inlist(indicator, "HTC_TST", "CARE_NEW", ///
 		"PMTCT_STAT", "PMTCT_ARV", "PMTCT_EID", "TX_NEW", "TX_CURR", ///
 		"OVC_SERV", "VMMC_CIRC") | inlist(indicator, "TB_STAT", "TB_ART" ///
@@ -36,12 +36,18 @@
 	* TX_NEW_<1 indicator
 	replace key_ind="TX_NEW_<1"	if indicator=="TX_NEW" & age=="<01"	
 
-* Delete Extrainous
+*create SAPR variable to sum up necessary variables
+	egen fy2016sapr = rowtotal(fy2016q1 fy2016q2)
+		replace fy2016sapr = fy2016q2 if inlist(indicator, "TX_CURR", ///
+			"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV")
+		replace fy2016sapr =. if fy2016sapr==0 //should be missing
+		
+* delete extrainous vars/obs
 	*drop if fundingagency=="Dedup" // looking at each partner individually
 	drop if key_ind=="" //only need data on key indicators
+	drop regionuid operatingunituid mechanismuid indicator fy2015* fy2016apr
 	rename key_ind indicator
 	order indicator,  before(numeratordenom) //place it back where indicator was located
-	drop regionuid operatingunituid mechanismuid fy2015* indicator
 	
 *export full dataset
 	export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL", nolabel replace dataf
@@ -54,3 +60,17 @@
 			nolabel replace dataf
 		}
 		*end
+
+
+**** Finer/Coarse Comparison/Completeness Check ***
+	*export tables to Excel for comparison		
+		
+*TX_NEW
+	tab operatingunit disaggregate if indicator=="TX_NEW" & age=="<01" //freq
+	table operatingunit disaggregate if indicator=="TX_NEW", c(sum fy2016sapr sum fy2016_targets)
+	table operatingunit disaggregate if indicator=="TX_NEW" & age=="<01", c(sum fy2016sapr sum fy2016_targets) m
+		
+*HTC_TST
+	tab operatingunit disaggregate if indicator=="HTC_TST" //freq
+	table operatingunit disaggregate if indicator=="HTC_TST" & inlist(disaggregate,"Age/Sex/Result", "Age/Sex Aggregated/Result", "Total Numerator"), c(sum fy2016sapr sum fy2016_targets) m
+	table operatingunit disaggregate if indicator=="HTC_TST" & inlist(disaggregate,"Age/Sex/Result", "Age/Sex Aggregated/Result") & resultstatus=="Positive", c(sum fy2016sapr sum fy2016_targets) m
