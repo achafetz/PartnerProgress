@@ -3,7 +3,7 @@
 **   Aaron Chafetz & Josh Davis
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 6/30/16
+**   Updated: 7/1/16
 
 /* NOTES
 	- Data source: ICPIFactView - SNU by IM Level_db-frozen_20160617 [Data Hub]
@@ -17,7 +17,7 @@
 *import data
 	import delimited "$data\ICPIFactView - SNU by IM Level_db-frozen_20160617.txt", clear
 	save "$output\ICPIFactView_SNUbyIM.dta", replace 
-	*use "$output\ICPIFactView_SNUbyIM.dta", clear
+	use "$output\ICPIFactView_SNUbyIM.dta", clear
 	
 *replace missing SNU prioritizatoins
 	replace snuprioritization="[not classified]" if snuprioritization==""
@@ -35,20 +35,29 @@
 		inlist(disaggregate, "Age/Sex/Result", "Age/Sex Aggregated/Result")
 	* TX_NEW_<1 indicator
 	replace key_ind="TX_NEW_<1"	if indicator=="TX_NEW" & age=="<01"	
-
+*rename disaggs
+	replace disaggregate="TOTAL NUMERATOR" if disaggregate=="Total Numerator"
+	replace disaggregate="FINER" if inlist(disaggregate, ///
+			"Age/Sex/Result", "Age/Sex")
+	replace disaggregate="COARSE" if inlist(disaggregate, ///
+			"Age/Sex Aggregated/Result", "Age/Sex Aggregated")
 *create SAPR variable to sum up necessary variables
 	egen fy2016sapr = rowtotal(fy2016q1 fy2016q2)
 		replace fy2016sapr = fy2016q2 if inlist(indicator, "TX_CURR", ///
 			"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV")
 		replace fy2016sapr =. if fy2016sapr==0 //should be missing
-		
+*adjust age for output so Excel does not interpret as date
+	gen age2 = "'" + age if age!=""
+	
 * delete extrainous vars/obs
 	*drop if fundingagency=="Dedup" // looking at each partner individually
 	drop if key_ind=="" //only need data on key indicators
-	drop regionuid operatingunituid mechanismuid indicator fy2015* fy2016apr
+	drop regionuid operatingunituid mechanismuid indicator age fy2015* fy2016apr
+	rename ïregion region
 	rename key_ind indicator
+	rename age2 age
 	order indicator,  before(numeratordenom) //place it back where indicator was located
-	
+	order age, before(sex)
 *export full dataset
 	export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL", nolabel replace dataf
 
