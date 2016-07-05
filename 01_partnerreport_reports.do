@@ -1,7 +1,7 @@
 **   Partner Performance by SNU
 **   COP FY16
 **   Aaron Chafetz
-**   Purpose: identify underachieving partners
+**   Purpose: track partners performance in TNZ
 **   Date: June 20, 2016
 **   Updated: 
 
