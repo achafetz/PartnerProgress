@@ -63,10 +63,13 @@
 
 *set up to loop through countries
 	qui:levelsof operatingunit, local(levels)
-	foreach o of local levels {
-		export delimited using "$excel\ICPIFactView_SNUbyIM `o'", ///
-			if operatingunit=="`o'" ///
+	foreach ou of local levels {
+		preserve
+		di "`ou'"
+		keep if operatingunit=="`ou'" 
+		export delimited using "$excel\ICPIFactView_SNUbyIM_20160705_`ou'", ///
 			nolabel replace dataf
+		restore
 		}
 		*end
 
