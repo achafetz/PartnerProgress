@@ -50,17 +50,17 @@
 			"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV")
 		replace fy2016sapr =. if fy2016sapr==0 //should be missing
 *adjust age for output so Excel does not interpret as date
-	gen age2 = "'" + age if age!=""
+	*gen age2 = "'" + age if age!=""
 	
 * delete extrainous vars/obs
 	*drop if fundingagency=="Dedup" // looking at each partner individually
 	drop if key_ind=="" //only need data on key indicators
-	drop regionuid operatingunituid mechanismuid indicator age fy2015* fy2016apr
+	drop regionuid operatingunituid mechanismuid indicator-coarsedisaggregate fy2015q3 fy2016apr
 	rename ïregion region
 	rename key_ind indicator
-	rename age2 age
-	order indicator,  before(numeratordenom) //place it back where indicator was located
-	order age, before(sex)
+	*rename age2 age
+	order indicator,  after(implementingmechanismname) //place it back where indicator was located
+	*order age, before(sex)
 	
 *export full dataset
 	local date = subinstr("`c(current_date)'", " ", "", .)
