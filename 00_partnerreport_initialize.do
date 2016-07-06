@@ -4,7 +4,7 @@
 **   Purpose: Initialize folder structure and global file paths
 **   Adapted from Tim Essam, USAID
 **   Date: June 16, 2016
-**   Updated: 
+**   Updated: 7/6/16
 
 ** SET DIRECTORIES **
 
@@ -33,7 +33,7 @@
 
 * Run initially to set up folder structure
 * Choose your folders to set up as the local macro `folders'
-	local folders RawData StataOutput ExcelOutput Documents
+	local folders RawData StataOutput ExcelOutput Documents ReportTemplate Reports
 	foreach dir in `folders' {
 		confirmdir "`dir'"
 		if `r(confirmdir)'==170 {

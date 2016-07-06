@@ -3,7 +3,7 @@
 **   Aaron Chafetz & Josh Davis
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 7/1/16
+**   Updated: 7/6/16
 
 /* NOTES
 	- Data source: ICPIFactView - SNU by IM Level_db-frozen_20160617 [Data Hub]
@@ -29,12 +29,15 @@
 		"PMTCT_STAT", "PMTCT_ARV", "PMTCT_EID", "TX_NEW", "TX_CURR", ///
 		"OVC_SERV", "VMMC_CIRC") | inlist(indicator, "TB_STAT", "TB_ART" ///
 		"KP_PREV", "PP_PREV")) & disaggregate=="Total Numerator"
+	
 	*HTC_TST_POS indicator
 	replace key_ind="HTC_TST_POS" if indicator=="HTC_TST" & ///
-		resultstatus=="Positive" & ///
-		inlist(disaggregate, "Age/Sex/Result", "Age/Sex Aggregated/Result")
+		resultstatus=="Positive" & disaggregate=="Results" 
+		*inlist(disaggregate, "Age/Sex/Result", "Age/Sex Aggregated/Result") //alternative to using Results disagg
+	/* NOT USING TX_NEW CURRENTLY
 	* TX_NEW_<1 indicator
 	replace key_ind="TX_NEW_<1"	if indicator=="TX_NEW" & age=="<01"	
+	*/
 *rename disaggs
 	replace disaggregate="TOTAL NUMERATOR" if disaggregate=="Total Numerator"
 	replace disaggregate="FINER" if inlist(disaggregate, ///
@@ -58,16 +61,19 @@
 	rename age2 age
 	order indicator,  before(numeratordenom) //place it back where indicator was located
 	order age, before(sex)
+	
 *export full dataset
-	export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL", nolabel replace dataf
+	local date = subinstr("`c(current_date)'", " ", "", .)
+	export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL_`date'", nolabel replace dataf
 
 *set up to loop through countries
 	qui:levelsof operatingunit, local(levels)
+	local date = subinstr("`c(current_date)'", " ", "", .)
 	foreach ou of local levels {
 		preserve
 		di "`ou'"
 		keep if operatingunit=="`ou'" 
-		export delimited using "$excel\ICPIFactView_SNUbyIM_20160705_`ou'", ///
+		export delimited using "$excel\ICPIFactView_SNUbyIM_`date'_`ou'", ///
 			nolabel replace dataf
 		restore
 		}
