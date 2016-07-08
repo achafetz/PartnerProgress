@@ -3,7 +3,7 @@
 **   Aaron Chafetz & Josh Davis
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 7/6/16
+**   Updated: 7/8/16
 
 /* NOTES
 	- Data source: ICPIFactView - SNU by IM Level_db-frozen_20160617 [Data Hub]
@@ -24,7 +24,7 @@
 
 *create new indicator variable for only the ones of interest for analysis
 	* for most indicators we just want their Total Numerator reported
-	* exceptions = HTC_TST, Positives & TX_CURR <1 --> need to "create" new var
+	* exceptions = HTC_TST Positives, TX_NET_NEW, & TX_CURR <1 --> need to "create" new var
 	gen key_ind=indicator if (inlist(indicator, "HTC_TST", "CARE_NEW", ///
 		"PMTCT_STAT", "PMTCT_ARV", "PMTCT_EID", "TX_NEW", "TX_CURR", ///
 		"OVC_SERV", "VMMC_CIRC") | inlist(indicator, "TB_STAT", "TB_ART" ///
@@ -38,6 +38,18 @@
 	* TX_NEW_<1 indicator
 	replace key_ind="TX_NEW_<1"	if indicator=="TX_NEW" & age=="<01"	
 	*/
+	*TX_NET_NEW
+	expand 2 if indicator=="TX_CURR", gen(new)
+		replace indicator = "TX_NET_NEW" if new==1
+		drop new
+	gen fy2015q4_nn = fy2015q4-fy2015q2
+	gen fy2016q2_nn = fy2016q2-fy2015q4
+	gen fy2016_targets_nn = fy2016_targets - fy2015q4
+	foreach x in fy2015q4 fy2016q2{
+		replace `x' = `x'_nn if indicator=="TX_NET_NEW"
+		drop `x'_nn
+		}
+		*end
 *rename disaggs
 	replace disaggregate="TOTAL NUMERATOR" if disaggregate=="Total Numerator"
 	replace disaggregate="FINER" if inlist(disaggregate, ///
