@@ -39,14 +39,14 @@
 	replace key_ind="TX_NEW_<1"	if indicator=="TX_NEW" & age=="<01"	
 	*/
 	*TX_NET_NEW
-	expand 2 if indicator=="TX_CURR", gen(new)
-		replace indicator = "TX_NET_NEW" if new==1
+	expand 2 if key_ind=="TX_CURR", gen(new)
+		replace key_ind= "TX_NET_NEW" if new==1
 		drop new
 	gen fy2015q4_nn = fy2015q4-fy2015q2
 	gen fy2016q2_nn = fy2016q2-fy2015q4
 	gen fy2016_targets_nn = fy2016_targets - fy2015q4
-	foreach x in fy2015q4 fy2016q2{
-		replace `x' = `x'_nn if indicator=="TX_NET_NEW"
+	foreach x in fy2015q4 fy2016q2 fy2016_targets {
+		replace `x' = `x'_nn if key_ind=="TX_NET_NEW"
 		drop `x'_nn
 		}
 		*end
