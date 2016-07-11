@@ -27,7 +27,7 @@
 	* exceptions = HTC_TST Positives, TX_NET_NEW, & TX_CURR <1 --> need to "create" new var
 	gen key_ind=indicator if (inlist(indicator, "HTC_TST", "CARE_NEW", ///
 		"PMTCT_STAT", "PMTCT_ARV", "PMTCT_EID", "TX_NEW", "TX_CURR", ///
-		"OVC_SERV", "VMMC_CIRC") | inlist(indicator, "TB_STAT", "TB_ART" ///
+		"OVC_SERV", "VMMC_CIRC") | inlist(indicator, "TB_STAT", "TB_ART", ///
 		"KP_PREV", "PP_PREV")) & disaggregate=="Total Numerator"
 	
 	*HTC_TST_POS indicator
