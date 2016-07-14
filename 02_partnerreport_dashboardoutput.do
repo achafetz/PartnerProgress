@@ -35,7 +35,7 @@
 		resultstatus=="Positive" & disaggregate=="Results" 
 		
 	*TX_NET_NEW indicator
-		expand 2 if indicator=="TX_CURR" & , gen(new) //create duplicate of TX_CURR
+		expand 2 if key_ind=="TX_CURR" & , gen(new) //create duplicate of TX_CURR
 			replace key_ind= "TX_NET_NEW" if new==1 //rename duplicate TX_NET_NEW
 			drop new
 		*create copy periods to replace . w/ 0 for generating net new (if . using in calc --> answer == .)
@@ -56,19 +56,11 @@
 			}
 			*end
 		
-*rename disaggs
-	replace disaggregate="TOTAL NUMERATOR" if disaggregate=="Total Numerator"
-	replace disaggregate="FINER" if inlist(disaggregate, ///
-			"Age/Sex/Result", "Age/Sex")
-	replace disaggregate="COARSE" if inlist(disaggregate, ///
-			"Age/Sex Aggregated/Result", "Age/Sex Aggregated")
 *create SAPR variable to sum up necessary variables
 	egen fy2016sapr = rowtotal(fy2016q1 fy2016q2)
 		replace fy2016sapr = fy2016q2 if inlist(indicator, "TX_CURR", ///
 			"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR")
 		replace fy2016sapr =. if fy2016sapr==0 //should be missing
-*adjust age for output so Excel does not interpret as date
-	*gen age2 = "'" + age if age!=""
 	
 * delete extrainous vars/obs
 	*drop if fundingagency=="Dedup" // looking at each partner individually
@@ -76,9 +68,7 @@
 	drop regionuid operatingunituid mechanismuid indicator-coarsedisaggregate fy2016apr
 	rename ïregion region
 	rename key_ind indicator
-	*rename age2 age
 	order indicator,  after(implementingmechanismname) //place it back where indicator was located
-	*order age, before(sex)
 	
 *export full dataset
 	local date = subinstr("`c(current_date)'", " ", "", .)
@@ -89,24 +79,10 @@
 	local date = subinstr("`c(current_date)'", " ", "", .)
 	foreach ou of local levels {
 		preserve
-		di "`ou'"
-		keep if operatingunit=="`ou'" 
-		export delimited using "$excel\ICPIFactView_SNUbyIM_`date'_`ou'", ///
+		di "export dataset: `ou' "
+		qui:keep if operatingunit=="`ou'" 
+		qui: export delimited using "$excel\ICPIFactView_SNUbyIM_`date'_`ou'", ///
 			nolabel replace dataf
 		restore
 		}
 		*end
-
-
-**** Finer/Coarse Comparison/Completeness Check ***
-	*export tables to Excel for comparison		
-		
-*TX_NEW
-	tab operatingunit disaggregate if indicator=="TX_NEW" & age=="<01" //freq
-	table operatingunit disaggregate if indicator=="TX_NEW", c(sum fy2016sapr sum fy2016_targets)
-	table operatingunit disaggregate if indicator=="TX_NEW" & age=="<01", c(sum fy2016sapr sum fy2016_targets) m
-		
-*HTC_TST
-	tab operatingunit disaggregate if indicator=="HTC_TST" //freq
-	table operatingunit disaggregate if indicator=="HTC_TST" & inlist(disaggregate,"Age/Sex/Result", "Age/Sex Aggregated/Result", "Total Numerator"), c(sum fy2016sapr sum fy2016_targets) m
-	table operatingunit disaggregate if indicator=="HTC_TST" & inlist(disaggregate,"Age/Sex/Result", "Age/Sex Aggregated/Result") & resultstatus=="Positive", c(sum fy2016sapr sum fy2016_targets) m
