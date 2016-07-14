@@ -24,32 +24,38 @@
 
 *create new indicator variable for only the ones of interest for analysis
 	* for most indicators we just want their Total Numerator reported
-	* exceptions = HTC_TST Positives, TX_NET_NEW, & TX_CURR <1 --> need to "create" new var
+	* exceptions = HTC_TST Positives & TX_NET_NEW --> need to "create" new var
 	gen key_ind=indicator if (inlist(indicator, "HTC_TST", "CARE_NEW", ///
 		"PMTCT_STAT", "PMTCT_ARV", "PMTCT_EID", "TX_NEW", "TX_CURR", ///
 		"OVC_SERV", "VMMC_CIRC") | inlist(indicator, "TB_STAT", "TB_ART", ///
-		"KP_PREV", "PP_PREV")) & disaggregate=="Total Numerator"
+		"KP_PREV", "PP_PREV", "CARE_CURR")) & disaggregate=="Total Numerator"
 	
 	*HTC_TST_POS indicator
 	replace key_ind="HTC_TST_POS" if indicator=="HTC_TST" & ///
 		resultstatus=="Positive" & disaggregate=="Results" 
-		*inlist(disaggregate, "Age/Sex/Result", "Age/Sex Aggregated/Result") //alternative to using Results disagg
-	/* NOT USING TX_NEW CURRENTLY
-	* TX_NEW_<1 indicator
-	replace key_ind="TX_NEW_<1"	if indicator=="TX_NEW" & age=="<01"	
-	*/
-	*TX_NET_NEW
-	expand 2 if key_ind=="TX_CURR", gen(new)
-		replace key_ind= "TX_NET_NEW" if new==1
-		drop new
-	gen fy2015q4_nn = fy2015q4-fy2015q2
-	gen fy2016q2_nn = fy2016q2-fy2015q4
-	gen fy2016_targets_nn = fy2016_targets - fy2015q4
-	foreach x in fy2015q4 fy2016q2 fy2016_targets {
-		replace `x' = `x'_nn if key_ind=="TX_NET_NEW"
-		drop `x'_nn
-		}
-		*end
+		
+	*TX_NET_NEW indicator
+		expand 2 if indicator=="TX_CURR" & , gen(new) //create duplicate of TX_CURR
+			replace key_ind= "TX_NET_NEW" if new==1 //rename duplicate TX_NET_NEW
+			drop new
+		*create copy periods to replace . w/ 0 for generating net new (if . using in calc --> answer == .)
+		foreach x in fy2015q2 fy2015q4 fy2016q2 fy2016_targets{
+			clonevar `x'_cc = `x' 
+			recode `x'_cc (. = 0) 
+			}
+			*end
+		*create net new variables
+		gen fy2015q4_nn = fy2015q4_cc-fy2015q2_cc
+		gen fy2016q2_nn = fy2016q2_cc-fy2015q4_cc
+		gen fy2016_targets_nn = fy2016_targets_cc - fy2015q4_cc
+		drop *_cc	
+		*replace period values with net_new
+		foreach x in fy2015q4 fy2016q2 fy2016_targets {
+			replace `x' = `x'_nn if key_ind=="TX_NET_NEW"
+			drop `x'_nn
+			}
+			*end
+		
 *rename disaggs
 	replace disaggregate="TOTAL NUMERATOR" if disaggregate=="Total Numerator"
 	replace disaggregate="FINER" if inlist(disaggregate, ///
@@ -59,7 +65,7 @@
 *create SAPR variable to sum up necessary variables
 	egen fy2016sapr = rowtotal(fy2016q1 fy2016q2)
 		replace fy2016sapr = fy2016q2 if inlist(indicator, "TX_CURR", ///
-			"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV")
+			"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR")
 		replace fy2016sapr =. if fy2016sapr==0 //should be missing
 *adjust age for output so Excel does not interpret as date
 	*gen age2 = "'" + age if age!=""
