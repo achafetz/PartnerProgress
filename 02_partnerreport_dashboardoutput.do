@@ -3,7 +3,7 @@
 **   Aaron Chafetz & Josh Davis
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 7/8/16
+**   Updated: 7/16/16
 
 /* NOTES
 	- Data source: ICPIFactView - SNU by IM Level_db-frozen_20160617 [Data Hub]
@@ -15,7 +15,7 @@
 ********************************************************************************
 
 *import data
-	import delimited "$data\ICPIFactView - SNU by IM Level_db-frozen_20160617.txt", clear
+	import delimited "$data\PSNU_IM_20160715.txt", clear
 	save "$output\ICPIFactView_SNUbyIM.dta", replace 
 	use "$output\ICPIFactView_SNUbyIM.dta", clear
 	
@@ -65,11 +65,18 @@
 * delete extrainous vars/obs
 	*drop if fundingagency=="Dedup" // looking at each partner individually
 	drop if key_ind=="" //only need data on key indicators
-	drop regionuid operatingunituid mechanismuid indicator-coarsedisaggregate fy2016apr
 	rename ïregion region
 	rename key_ind indicator
-	order indicator,  after(implementingmechanismname) //place it back where indicator was located
-	
+	keep region operatingunit countryname psnu psnuuid snuprioritization ///
+		fundingagency primepartner mechanismid implementingmechanismname ///
+		indicator fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
+		fy2016q1 fy2016q2 fy2016sapr
+	order region operatingunit countryname psnu psnuuid snuprioritization ///
+		fundingagency primepartner mechanismid implementingmechanismname ///
+		indicator fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
+		fy2016q1 fy2016q2 fy2016sapr
+
+
 *export full dataset
 	local date = subinstr("`c(current_date)'", " ", "", .)
 	export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL_`date'", nolabel replace dataf
