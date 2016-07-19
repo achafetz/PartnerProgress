@@ -45,17 +45,21 @@
 			}
 			*end
 		*create net new variables
-		gen fy2015q4_nn = fy2015q4_cc-fy2015q2_cc
 		gen fy2016q2_nn = fy2016q2_cc-fy2015q4_cc
 		gen fy2016_targets_nn = fy2016_targets_cc - fy2015q4_cc
 		drop *_cc	
 		*replace period values with net_new
-		foreach x in fy2015q4 fy2016q2 fy2016_targets {
+		*foreach x in fy2015q4 fy2016q2 fy2016_targets {
+		foreach x in fy2016q2 fy2016_targets {
 			replace `x' = `x'_nn if key_ind=="TX_NET_NEW"
 			drop `x'_nn
 			}
 			*end
-		
+		*remove tx net new values for fy15
+		foreach pd in fy2015q2 fy2015q3 fy2015q4 fy2015apr {
+			replace `pd' = . if key_ind=="TX_NET_NEW" 
+			}
+			*end
 *create SAPR variable to sum up necessary variables
 	egen fy2016sapr = rowtotal(fy2016q1 fy2016q2)
 		replace fy2016sapr = fy2016q2 if inlist(indicator, "TX_CURR", ///
@@ -63,8 +67,8 @@
 		replace fy2016sapr =. if fy2016sapr==0 //should be missing
 	
 * delete extrainous vars/obs
-	*drop if fundingagency=="Dedup" // looking at each partner individually
 	drop if key_ind=="" //only need data on key indicators
+	drop indicator
 	rename ïregion region
 	rename key_ind indicator
 	keep region operatingunit countryname psnu psnuuid snuprioritization ///
