@@ -43,7 +43,8 @@
 		(indicator=="PP_PREV" & inlist(age, "10-14", "15-19", "20-24")) | ///
 		(indicator=="TX_CURR" & inlist(age, "5-14", "15-19", "20+")) | ///
 		(indicator=="OVC_SERV" & disaggregate=="Age/Sex" & ///
-			inlist(age, "10-14", "15-17", "18-24")) | ///
+		inlist(age, "10-14", "15-17", "18-24")) | inlist(otherdisaggregate, "Economic Strengthening", "Education Support", "Other Service Areas", ///
+		"Parenting/Caregiver Programs", "Social Protection")  | /// 
 		(indicator=="KP_PREV" & otherdisaggregate=="FSW")
 			
 		/* add for Q4
@@ -85,11 +86,11 @@
 	rename key_ind indicator
 	keep region operatingunit countryname psnu psnuuid snuprioritization ///
 		fundingagency primepartner mechanismid implementingmechanismname ///
-		indicator age sex fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
+		indicator age sex otherdisaggregate fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
 		fy2016q1 fy2016q2 fy2016q2 fy2016sapr fy2016q3 fy2016cum
 	order region operatingunit countryname psnu psnuuid snuprioritization ///
 		fundingagency primepartner mechanismid implementingmechanismname ///
-		indicator age sex fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
+		indicator age sex otherdisaggregate fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
 		fy2016q1 fy2016q2 fy2016q2 fy2016sapr fy2016q3 fy2016cum
 
 *export full dataset
