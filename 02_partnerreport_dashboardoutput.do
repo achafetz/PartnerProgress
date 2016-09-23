@@ -3,7 +3,7 @@
 **   Aaron Chafetz & Josh Davis
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 8/29/2016
+**   Updated: 9/9/2016
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM_20160822 [ICPI Data Store]
@@ -15,14 +15,16 @@
 */
 ********************************************************************************
 
+*set date of frozen instance - needs to be changed w/ updated data
+	local datestamp "20160909"
 *import/open data
-	capture confirm file "$output\ICPIFactView_SNUbyIM20160822.dta"
+	capture confirm file "$output\ICPIFactView_SNUbyIM`datestamp'.dta"
 		if !_rc{
-			use "$output\ICPIFactView_SNUbyIM20160822.dta", clear
+			use "$output\ICPIFactView_SNUbyIM`datestamp'.dta", clear
 		}
 		else{
-			import delimited "$data\ICPI_Fact_View_PSNU_IM_20160822.txt", clear
-			save "$output\ICPIFactView_SNUbyIM20160822.dta", replace
+			import delimited "$data\ICPI_Fact_View_PSNU_IM_`datestamp'.txt", clear
+			save "$output\ICPIFactView_SNUbyIM`datestamp'.dta", replace
 		}
 	*end
 

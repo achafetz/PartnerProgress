@@ -43,8 +43,10 @@
 		(indicator=="PP_PREV" & inlist(age, "10-14", "15-19", "20-24")) | ///
 		(indicator=="TX_CURR" & inlist(age, "5-14", "15-19", "20+")) | ///
 		(indicator=="OVC_SERV" & disaggregate=="Age/Sex" & ///
-		inlist(age, "10-14", "15-17", "18-24")) | inlist(otherdisaggregate, "Economic Strengthening", "Education Support", "Other Service Areas", ///
-		"Parenting/Caregiver Programs", "Social Protection")  | /// 
+			inlist(age, "10-14", "15-17", "18-24") & inlist(otherdisaggregate, ///
+			"Economic Strengthening", "Education Support", ///
+			"Other Service Areas", "Parenting/Caregiver Programs", ///
+			"Social Protection"))  | /// 
 		(indicator=="KP_PREV" & otherdisaggregate=="FSW")
 			
 		/* add for Q4

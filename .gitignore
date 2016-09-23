@@ -5,9 +5,17 @@
 *.dta
 *.txt
 
+#documents and other files
+*.pdf
+*.docx
+*.pptx
+*.zip
+*.rtf
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
+*.png
 
 # Folder config file
 Desktop.ini
