@@ -3,7 +3,7 @@
 **   Aaron Chafetz & Josh Davis
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 9/9/2016
+**   Updated: 10/3/2016
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM_20160822 [ICPI Data Store]
@@ -14,6 +14,12 @@
 		OVC_SERV, VMMC_CIRC, KP_PREV, PP_PREV, and CARE_CURR
 */
 ********************************************************************************
+
+*Which outputs to produce? 0 = No, 1 = Yes
+	global global_output 0	 //full global dataset
+	global ctry_output 1 	//one dataset for every OU
+	global sel_output 1	//just an outut for select OU specified below
+	global sel_output_list "Mozambique"  //OU selection
 
 *set date of frozen instance - needs to be changed w/ updated data
 	local datestamp "20160909"
@@ -84,19 +90,19 @@
 		replace fy2016`agg' =. if fy2016`agg'==0 //should be missing
 		}
 		*end
-*
-	foreach pd in fy2015q3 fy2016q1 fy2016q3{
-		replace `pd'=. if inlist(indicator, "TX_CURR", "OVC_SERV", ///
-			"PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR")
-		}
+
 *delete reporting that shouldn't have occured
+	/*
 	tabstat fy2015q3 fy2016q1 fy2016q3 if inlist(indicator, "TX_CURR", ///
 		"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR"), ///
-		s(sum count) by(operatingunit)	
-	foreach pd in fy2015q3 fy2016q1 fy2016q3{
+		s(sum count) by(operatingunit)
+	*/
+	ds *q1 *q3
+	foreach pd in `r(varlist)'{
 		replace `pd'=. if inlist(indicator, "TX_CURR", "OVC_SERV", ///
 			"PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR")
 		}
+		*end
 * delete extrainous vars/obs
 	drop if key_ind=="" //only need data on key indicators
 	drop indicator
@@ -110,20 +116,34 @@
 		fundingagency primepartner mechanismid implementingmechanismname ///
 		indicator fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
 		fy2016q1 fy2016q2 fy2016q2 fy2016sapr fy2016q3 fy2016cum
-
+	
 *export full dataset
-	local date = subinstr("`c(current_date)'", " ", "", .)
-	export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL_`date'", nolabel replace dataf
-
-*set up to loop through countries
-	qui:levelsof operatingunit, local(levels)
-	local date = subinstr("`c(current_date)'", " ", "", .)
-	foreach ou of local levels {
-		preserve
-		di "export dataset: `ou' "
-		qui:keep if operatingunit=="`ou'"
-		qui: export delimited using "$excel\ICPIFactView_SNUbyIM_`date'_`ou'", ///
-			nolabel replace dataf
-		restore
+	if $global_output == 1 {
+		di "GLOBAL OUTPUT"
+		local date = subinstr("`c(current_date)'", " ", "", .)
+		export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL_`date'", ///
+		nolabel replace dataf
 		}
 		*end
+	
+*set up to loop through countries
+	if $ctry_output == 1{
+		di "COUNTRY OUTPUT"
+		if $sel_output == 1 {
+			keep if inlist(operatingunit, "$sel_output_list")
+			}
+		qui:levelsof operatingunit, local(levels)
+		local date = subinstr("`c(current_date)'", " ", "", .)
+		foreach ou of local levels {
+			preserve
+			qui:keep if operatingunit=="`ou'"
+			di in yellow "append IM dataset: `ou'"
+			qui: append using "$output\ICPIFactView_SiteIM_`date'_`ou'"
+			qui: order facilityuid facilityprioritization, before(indicator)
+			di in yellow "export dataset: `ou' "
+			qui: export delimited using "$excel\ICPIFactView_SNUbyIM_`date'_`ou'", ///
+				nolabel replace dataf
+			restore
+			}
+			}
+			*end
