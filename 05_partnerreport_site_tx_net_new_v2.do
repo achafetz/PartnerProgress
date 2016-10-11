@@ -3,7 +3,7 @@
 **   Aaron Chafetz
 **   Purpose: generate site level aggre
 **   Date: September 22, 2016
-**   Updated: 10/3
+**   Updated: 10/4
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM_20160822 [ICPI Data Store]
@@ -107,17 +107,20 @@
 			}
 		ds *_cc
 		recode `r(varlist)' (.=0)
-	*New variable - not retained on treatment (will be stored in TX_CURR)
+	*new variable - not retained on treatment (will be stored in TX_CURR)
 		gen tx_not_ret = fy2016saprTX_NEW_cc-fy2016saprTX_NET_NEW_cc
-			*change to missing  
+			*change to missing if not in both time periods  
 			replace tx_not_ret = . if ///
-				(inlist(fy2016saprTX_NEW, ., 0) & inlist(fy2016saprTX_NET_NEW, ., 0)) // if TX_NEW and NET_NEW were both missing
-				
-			
+				(inlist(fy2016saprTX_NEW, ., 0) & inlist(fy2016saprTX_NET_NEW, ., 0)) | /// if either TX_NEW and NET_NEW were missing
+				(inlist(fy2015aprTX_CURR, ., 0) & inlist(fy2016saprTX_CURR, ., 0))
 		drop *_cc
 	*reshape back to long from wide
 		reshape long
-
+		
+*new variable - site exits for TX_CURR in both SAPR and APR
+	gen bothpds = 0
+		replace bothpds = 1 if (!inlist(fy2015apr, ., 0) & ///
+			inlist(!fy2016sapr, ., 0) & indicator=="TX_CURR")
 * delete extrainous vars/obs
 	rename tx_not_ret fy2016sapr_tx_not_ret 
 	drop if indicator=="TX_NET_NEW" // only needed for not retain calculation
@@ -128,7 +131,7 @@
 	local vars region operatingunit countryname psnu psnuuid snuprioritization ///
 		fundingagency implementingmechanismname facilityuid ///
 		facilityprioritization indicator ///
-		fy2015apr fy2016_targets fy2016sapr fy2016sapr_tx_not_ret
+		fy2015apr fy2016_targets fy2016sapr fy2016sapr_tx_not_ret bothpds
 	keep `vars' 
 	order `vars'  
 
