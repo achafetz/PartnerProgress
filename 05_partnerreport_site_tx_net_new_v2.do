@@ -15,7 +15,7 @@
 
 *set date of frozen instance - needs to be changed w/ updated data
 	local datestamp "20160915"
-	local ou Mozambique
+	local ou ALLTX
 *import/open data
 	capture confirm file "$output\ICPIFactView_`ou'_Site_IM`datestamp'.dta"
 		if !_rc{
@@ -93,13 +93,14 @@
 
 *create not retained on TX variable (TX_NEW - TX_NET_NEW) --> dataset needs to be wide
 	*collapse so only one observation per site
-		collapse (sum) fy2015apr fy2016_targets fy2016sapr, by(region ///
+		collapse (sum) fy2015q2 fy2015apr fy2016_targets fy2016sapr, by(region ///
 			operatingunit countryname psnu psnuuid snuprioritization facilityuid ///
 			facilityprioritization indicator fundingagency implementingmechanismname)
 	*reshape wide
 		*drop if typemilitary=="Y"
 		*egen id = group(psnuuid mechanismid primepartner communityuid facilityuid indicatortype) 
-		reshape wide fy2015apr fy2016_targets fy2016sapr, i(facilityuid fundingagency implementingmechanismname) ///
+		reshape wide fy2015q2 fy2015apr fy2016_targets fy2016sapr, ///
+			i(operatingunit countryname facilityuid fundingagency implementingmechanismname) ///
 			j(indicator, string)
 	*create copy periods to replace "." w/ 0 for generating net new (if . using in calc --> answer == .)
 		foreach fy in fy2016saprTX_NEW fy2016saprTX_NET_NEW{
@@ -118,9 +119,17 @@
 		reshape long
 		
 *new variable - site exits for TX_CURR in both SAPR and APR
+	*have to collapse up partners to site level and then merge back in
+	preserve
+	collapse (sum) fy2015apr fy2016sapr if indicator=="TX_CURR", by(operatingunit facilityuid)
 	gen bothpds = 0
 		replace bothpds = 1 if (!inlist(fy2015apr, ., 0) & ///
-			inlist(!fy2016sapr, ., 0) & indicator=="TX_CURR")
+			!inlist(fy2016sapr, ., 0))
+	drop fy*
+	tempfile bothpds
+	save "`bothpds'"
+	restore
+	merge m:1 operatingunit facilityuid using "`bothpds'"
 * delete extrainous vars/obs
 	rename tx_not_ret fy2016sapr_tx_not_ret 
 	drop if indicator=="TX_NET_NEW" // only needed for not retain calculation
@@ -131,7 +140,7 @@
 	local vars region operatingunit countryname psnu psnuuid snuprioritization ///
 		fundingagency implementingmechanismname facilityuid ///
 		facilityprioritization indicator ///
-		fy2015apr fy2016_targets fy2016sapr fy2016sapr_tx_not_ret bothpds
+		fy2015q2 fy2015apr fy2016_targets fy2016sapr fy2016sapr_tx_not_ret bothpds
 	keep `vars' 
 	order `vars'  
 

@@ -3,7 +3,7 @@
 **   Aaron Chafetz & Josh Davis
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 10/11/2016
+**   Updated: 10/18/2016
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM_20160822 [ICPI Data Store]
@@ -17,12 +17,15 @@
 
 *Which outputs to produce? 0 = No, 1 = Yes
 	global global_output 1	 //full global dataset
-	global ctry_output 0 	//one dataset for every OU
+	global ctry_output 1 	//one dataset for every OU
 	global sel_output 0	//just an outut for select OU specified below
 	global sel_output_list "Mozambique"  //OU selection
-
+	global site_app 0 //append site data
+*set today's date for saving
+	global date = subinstr("`c(current_date)'", " ", "", .)
+	
 *set date of frozen instance - needs to be changed w/ updated data
-	local datestamp "20160909"
+	local datestamp "20161010"
 *import/open data
 	capture confirm file "$output\ICPIFactView_SNUbyIM`datestamp'.dta"
 		if !_rc{
@@ -118,14 +121,20 @@
 		fy2016q1 fy2016q2 fy2016q2 fy2016sapr fy2016q3 fy2016cum
 
 *append all site
-	local datestamp "20160915"
-	append using "$output\ICPIFactView_ALLTX_Site_IM`datestamp'"
+	if $site_app == 1 {
+		append using "$output\ICPIFactView_SiteIM_$date_ALLTX"
+		}
+	else{
+		gen facilityuid = .
+		gen facilityprioritization = .
+		}
+	order facilityuid facilityprioritization, before(indicator)
+	
 	
 *export full dataset
 	if $global_output == 1 {
 		di "GLOBAL OUTPUT"
-		local date = subinstr("`c(current_date)'", " ", "", .)
-		export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL_`date'", ///
+		export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL_$date", ///
 		nolabel replace dataf
 		}
 		*end
@@ -137,15 +146,12 @@
 			keep if inlist(operatingunit, "$sel_output_list")
 			}
 		qui:levelsof operatingunit, local(levels)
-		local date = subinstr("`c(current_date)'", " ", "", .)
 		foreach ou of local levels {
 			preserve
 			qui:keep if operatingunit=="`ou'"
-			*di in yellow "append IM dataset: `ou'"
-			*qui: append using "$output\ICPIFactView_SiteIM_`date'_`ou'"
 			qui: order facilityuid facilityprioritization, before(indicator)
 			di in yellow "export dataset: `ou' "
-			qui: export delimited using "$excel\ICPIFactView_SNUbyIM_`date'_`ou'", ///
+			qui: export delimited using "$excel\ICPIFactView_SNUbyIM_$date_`ou'", ///
 				nolabel replace dataf
 			restore
 			}
