@@ -40,17 +40,21 @@
 	replace indicator="PREP_NEW" if indicator=="PrEP_NEW"
 	gen key_ind=""
 	replace key_ind = indicator if ///
-		(inlist(indicator, "HTC_TST", "TX_NEW")	& ///
+		(indicator=="HTC_TST"	& ///
 			inlist(age, "10-14", "15-19", "20-24") & ///
-			inlist(disaggregate, "Age/Sex", "Age/Sex/Result")) | ///
-		(inlist(indicator, "HTC_TST", "TX_NEW") & age=="25-49" & sex=="male") | ///
+			disaggregate=="Age/Sex/Result") | ///
+		(indicator=="TX_NEW"	& ///
+			inlist(age, "10-14", "15-19", "20-24") & ///
+			disaggregate=="Age/Sex") | ///
+		(indicator=="HTC_TST" & age=="25-49" & disaggregate=="Age/Sex/Result" & sex=="Male") | ///
+		(indicator=="HTC_TST" & age=="25-49" & disaggregate=="Age/Sex" & sex=="Male") | ///
 		(indicator=="VMMC_CIRC" & ///
 			inlist(age, "10-14", "15-19", "20-24", "25-29")) | ///
 		(indicator=="PMTCT_STAT" & disaggregate=="Known/New/Age") | ///
 		(indicator=="PREP_NEW" & inlist(age, "15-19", "20-24")) | ///
 		(indicator=="PP_PREV" & inlist(age, "10-14", "15-19", "20-24")) | ///
 		(indicator=="TX_CURR" & inlist(age, "5-14", "15-19", "20+")) | ///
-		(indicator=="OVC_SERV" & disaggregate=="Age/Sex" & ///
+		(indicator=="OVC_SERV" & disaggregate=="Age/Sex/Service" & ///
 			inlist(age, "10-14", "15-17", "18-24") & inlist(otherdisaggregate, ///
 			"Economic Strengthening", "Education Support", ///
 			"Other Service Areas", "Parenting/Caregiver Programs", ///
@@ -126,5 +130,5 @@
 *merge DREAMS + additional 4 OUs
 	local date = subinstr("`c(current_date)'", " ", "", .)
 	append using "$output\ICPIFactView_SNUbyIM_DREAMS_extras_`date'"
-	export delimited using "$excel\ICPIFactView_SNUbyIM_DREAMS_GLOBAL+_`date'", nolabel replace dataf
+	export delimited using "$excel\ICPIFactView_SNUbyIM_DREAMS_GLOBAL+_`date'.txt", nolabel replace dataf
 */
