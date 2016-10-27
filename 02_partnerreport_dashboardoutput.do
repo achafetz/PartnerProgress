@@ -16,10 +16,10 @@
 ********************************************************************************
 
 *Which outputs to produce? 0 = No, 1 = Yes
-	global global_output 1	 //full global dataset
+	global global_output 0	 //full global dataset
 	global ctry_output 1 	//one dataset for every OU
 	global sel_output 0	//just an outut for select OU specified below
-	global sel_output_list "Mozambique"  //OU selection
+	global sel_output_list "Malawi"  //OU selection
 	global site_app 0 //append site data
 *set today's date for saving
 	global date = subinstr("`c(current_date)'", " ", "", .)
@@ -134,7 +134,7 @@
 *export full dataset
 	if $global_output == 1 {
 		di "GLOBAL OUTPUT"
-		export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL_$date", ///
+		export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL_${date}", ///
 		nolabel replace dataf
 		}
 		*end
@@ -151,7 +151,7 @@
 			qui:keep if operatingunit=="`ou'"
 			qui: order facilityuid facilityprioritization, before(indicator)
 			di in yellow "export dataset: `ou' "
-			qui: export delimited using "$excel\ICPIFactView_SNUbyIM_$date_`ou'", ///
+			qui: export delimited using "$excel\ICPIFactView_SNUbyIM_${date}_`ou'", ///
 				nolabel replace dataf
 			restore
 			}
