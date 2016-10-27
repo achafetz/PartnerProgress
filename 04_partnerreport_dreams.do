@@ -3,7 +3,7 @@
 **   Aaron Chafetz & Josh Davis
 **   Purpose: generate DREAMS output for Excel monitoring dashboard
 **   Date: Sept 8, 2016
-**   Updated: 
+**   Updated: 10/27/16
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM_20160822 [ICPI Data Store]
@@ -14,16 +14,24 @@
 */
 ********************************************************************************
 
+*set date of frozen instance - needs to be changed w/ updated data
+	local datestamp "20161010"
 *import/open data
-	capture confirm file "$output\ICPIFactView_SNUbyIM20160822.dta"
+	capture confirm file "$output\ICPIFactView_SNUbyIM_DREAMS_`datestamp'.dta"
 		if !_rc{
-			use "$output\ICPIFactView_SNUbyIM20160822.dta", clear
+			use "$output\ICPIFactView_SNUbyIM_DREAMS_`datestamp'.dta", clear
 		}
 		else{
-			import delimited "$data\ICPI_Fact_View_PSNU_IM_20160822.txt", clear
-			save "$output\ICPIFactView_SNUbyIM20160822.dta", replace
+			import delimited "$data\PSNU_IM_DREAMS_`datestamp'.txt", clear
+			save "$output\ICPIFactView_SNUbyIM_DREAMS_`datestamp'.dta", replace
 		}
 	*end
+/*
+*import SNU by IM data for non DREAMS countries
+	local datestamp "20161010"
+	use "$output\ICPIFactView_SNUbyIM`datestamp'.dta", clear
+	keep if inlist(operatingunit, "Namibia", "Ethiopia", "Cote d'Ivoire", "Botswana") 
+*/
 
 *replace missing SNU prioritizatoins
 	replace snuprioritization="[not classified]" if snuprioritization==""
@@ -86,15 +94,37 @@
 	drop indicator
 	rename ïregion region
 	rename key_ind indicator
+	capture confirm variable dsnu
+		if !_rc{
+		drop psnu psnuuid
+		rename dsnu psnu
+		rename dsnuuid psnuuid
+		}
+	gen facilityuid	= ""
+	gen facilityprioritization =""
+
 	keep region operatingunit countryname psnu psnuuid snuprioritization ///
 		fundingagency primepartner mechanismid implementingmechanismname ///
-		indicator age sex otherdisaggregate fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
+		facilityuid facilityprioritization indicator age sex otherdisaggregate ///
+		fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
 		fy2016q1 fy2016q2 fy2016q2 fy2016sapr fy2016q3 fy2016cum
 	order region operatingunit countryname psnu psnuuid snuprioritization ///
 		fundingagency primepartner mechanismid implementingmechanismname ///
-		indicator age sex otherdisaggregate fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
+		facilityuid facilityprioritization indicator age sex otherdisaggregate ///
+		fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
 		fy2016q1 fy2016q2 fy2016q2 fy2016sapr fy2016q3 fy2016cum
 
+/*
+*save extra DREAMS countries for merging onto DREAMS dataset
+	local date = subinstr("`c(current_date)'", " ", "", .)
+	save "$output\ICPIFactView_SNUbyIM_DREAMS_extras_`date'", replace
+*/
 *export full dataset
 	local date = subinstr("`c(current_date)'", " ", "", .)
 	export delimited using "$excel\ICPIFactView_SNUbyIM_DREAMS_GLOBAL_`date'", nolabel replace dataf
+/*
+*merge DREAMS + additional 4 OUs
+	local date = subinstr("`c(current_date)'", " ", "", .)
+	append using "$output\ICPIFactView_SNUbyIM_DREAMS_extras_`date'"
+	export delimited using "$excel\ICPIFactView_SNUbyIM_DREAMS_GLOBAL+_`date'", nolabel replace dataf
+*/
