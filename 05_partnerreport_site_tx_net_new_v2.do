@@ -109,9 +109,10 @@
 		ds *_cc
 		recode `r(varlist)' (.=0)
 	*new variable - not retained on treatment (will be stored in TX_CURR)
-		gen tx_not_ret = fy2016saprTX_NEW_cc-fy2016saprTX_NET_NEW_cc
+		*gen tx_not_ret = fy2016saprTX_NEW_cc-fy2016saprTX_NET_NEW_cc
+		gen tx_ret = fy2016saprTX_NET_NEW_cc - fy2016saprTX_NEW_cc
 			*change to missing if not in both time periods  
-			replace tx_not_ret = . if ///
+			replace tx_ret = . if ///
 				(inlist(fy2016saprTX_NEW, ., 0) & inlist(fy2016saprTX_NET_NEW, ., 0)) | /// if either TX_NEW and NET_NEW were missing
 				(inlist(fy2015aprTX_CURR, ., 0) & inlist(fy2016saprTX_CURR, ., 0))
 		drop *_cc
@@ -131,16 +132,16 @@
 	restore
 	merge m:1 operatingunit facilityuid using "`bothpds'"
 * delete extrainous vars/obs
-	rename tx_not_ret fy2016sapr_tx_not_ret 
+	rename tx_ret fy2016sapr_tx_ret 
 	drop if indicator=="TX_NET_NEW" // only needed for not retain calculation
-	replace fy2016sapr_tx_not_ret = . if indicator!="TX_CURR" //only want one obs of tx_not_retained
-	drop if fy2015apr==. & fy2016sapr==. & fy2016sapr_tx_not_ret==. //drop if all relevant pd results are both missing
+	replace fy2016sapr_tx_ret = . if indicator!="TX_CURR" //only want one obs of tx_retained
+	drop if fy2015apr==. & fy2016sapr==. & fy2016sapr_tx_ret==. //drop if all relevant pd results are both missing
 	
 * keep and order variables
 	local vars region operatingunit countryname psnu psnuuid snuprioritization ///
 		fundingagency implementingmechanismname facilityuid ///
 		facilityprioritization indicator ///
-		fy2015q2 fy2015apr fy2016_targets fy2016sapr fy2016sapr_tx_not_ret bothpds
+		fy2015q2 fy2015apr fy2016_targets fy2016sapr fy2016sapr_tx_ret bothpds
 	keep `vars' 
 	order `vars'  
 
