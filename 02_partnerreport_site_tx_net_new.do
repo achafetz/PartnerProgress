@@ -16,6 +16,10 @@
 *set date of frozen instance - needs to be changed w/ updated data
 	local datestamp "20160915"
 	local ou ALLTX
+	
+*set today's date for saving
+	global date = subinstr("`c(current_date)'", " ", "", .)
+	
 *import/open data
 	capture confirm file "$output\ICPIFactView_`ou'_Site_IM`datestamp'.dta"
 		if !_rc{
@@ -146,6 +150,5 @@
 	order `vars'  
 
 *save as dta file for appending onto PSNU version [need to add to 02 do file]
-	local date = subinstr("`c(current_date)'", " ", "", .)
-	save "$output\ICPIFactView_SiteIM_`date'_`ou'", replace
+	save "$output\ICPIFactView_SiteIM_${date}_`ou'", replace
 
