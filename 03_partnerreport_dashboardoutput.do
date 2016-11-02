@@ -21,19 +21,21 @@
 	global sel_output 1	//just an outut for select OU specified below
 	global sel_output_list "Mozambique"  //OU selection
 	global site_app 1 //append site data
+	
 *set today's date for saving
 	global date = subinstr("`c(current_date)'", " ", "", .)
 	
 *set date of frozen instance - needs to be changed w/ updated data
-	local datestamp "20161010"
+	global datestamp "20161010"
+	
 *import/open data
-	capture confirm file "$output\ICPIFactView_SNUbyIM`datestamp'.dta"
+	capture confirm file "$output\ICPIFactView_SNUbyIM${datestamp}.dta"
 		if !_rc{
-			use "$output\ICPIFactView_SNUbyIM`datestamp'.dta", clear
+			use "$output\ICPIFactView_SNUbyIM${datestamp}.dta", clear
 		}
 		else{
-			import delimited "$data\ICPI_Fact_View_PSNU_IM_`datestamp'.txt", clear
-			save "$output\ICPIFactView_SNUbyIM`datestamp'.dta", replace
+			import delimited "$data\ICPI_Fact_View_PSNU_IM_${datestamp}.txt", clear
+			save "$output\ICPIFactView_SNUbyIM${datestamp}.dta", replace
 		}
 	*end
 
