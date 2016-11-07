@@ -3,7 +3,7 @@
 **   Aaron Chafetz & Josh Davis
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 11/1/2016
+**   Updated: 11/3/2016
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM_20160822 [ICPI Data Store]
@@ -62,39 +62,46 @@
 		disaggregate=="Known/New"
 
 	*TX_NET_NEW indicator
-		expand 2 if key_ind=="TX_CURR" & , gen(new) //create duplicate of TX_CURR
-			replace key_ind= "TX_NET_NEW" if new==1 //rename duplicate TX_NET_NEW
+			expand 2 if indicator=="TX_CURR" & , gen(new) //create duplicate of TX_CURR
+			replace indicator= "TX_NET_NEW" if new==1 //rename duplicate TX_NET_NEW
 			drop new
-		*create copy periods to replace . w/ 0 for generating net new (if . using in calc --> answer == .)
-		foreach x in fy2015q2 fy2015q4 fy2016q2 fy2016_targets{
+		*create copy periods to replace "." w/ 0 for generating net new (if . using in calc --> answer == .)
+		foreach x in fy2015q4 fy2016q2 fy2016q4 fy2016_targets{
 			clonevar `x'_cc = `x'
 			recode `x'_cc (. = 0)
 			}
 			*end
 		*create net new variables
 		gen fy2016q2_nn = fy2016q2_cc-fy2015q4_cc
+			replace fy2016q2_nn = . if (fy2016q2==. & fy2015q4==.)
+		gen fy2016q4_nn = fy2016q4_cc-fy2015q4_cc
+			replace fy2016q4_nn = . if (fy2016q4==. & fy2015q4==.)
 		gen fy2016_targets_nn = fy2016_targets_cc - fy2015q4_cc
+			replace fy2016_targets_nn = . if fy2016_targets==. & fy2015q4==.
 		drop *_cc
-		*replace period values with net_new
-		foreach x in fy2016q2 fy2016_targets {
-			replace `x' = `x'_nn if key_ind=="TX_NET_NEW"
+		*replace raw period values with generated net_new values
+		foreach x in fy2016q2 fy2016q4 fy2016_targets {
+			replace `x' = `x'_nn if indicator=="TX_NET_NEW"
 			drop `x'_nn
 			}
 			*end
 		*remove tx net new values for fy15
 		foreach pd in fy2015q2 fy2015q3 fy2015q4 fy2015apr {
-			replace `pd' = . if key_ind=="TX_NET_NEW"
+			replace `pd' = . if indicator=="TX_NET_NEW"
 			}
 			*end
-*create SAPR and cumulative variable to sum up necessary variables
-	foreach agg in "sapr" "cum" {
-		if "`agg'"=="sapr" egen fy2016`agg' = rowtotal(fy2016q1 fy2016q2)
-			else egen fy2016`agg' = rowtotal(fy2016q*)
-		replace fy2016`agg' = fy2016q2 if inlist(indicator, "TX_CURR", ///
-			"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR")
-		replace fy2016`agg' =. if fy2016`agg'==0 //should be missing
-		}
-		*end
+			
+	*create SAPR and cumulative variable to sum up necessary variables
+		local i 2
+		foreach agg in "sapr" "cum" {
+			if "`agg'"=="sapr" egen fy2016`agg' = rowtotal(fy2016q1 fy2016q2)
+				else egen fy2016`agg' = rowtotal(fy2016q*)
+			replace fy2016`agg' = fy2016q`i' if inlist(indicator, "TX_CURR", ///
+				"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR")
+			replace fy2016`agg' =. if fy2016`agg'==0 //should be missing
+			local i = `i' + 2
+			}
+			*end
 
 *delete reporting that shouldn't have occured
 	/*
