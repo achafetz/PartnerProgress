@@ -21,6 +21,7 @@ This grouping method will rename the districts you want groups with a common ide
    * With the psnu column selected, hit Ctrl + H.
    * In the "Find what:" box, enter the name of one of the SNUs you want to group
    * In the "Replace with" box, enter the SNU group name. Be sure to add group or some other marker to make it clear this is not just the single SNU.
+   * Finally, hit the "Replace All" button to replace the old SNU name with the SNU group name.
    * Repeat this process for all SNUs in that group and then for any other grouped SNUs
-5.Now that you have replaced the names, you will need to update all the pivot tables in the workbook. In the ribbon at the top of Excel, navigate to Data > Connections and hit Refresh All.
+5. Now that you have replaced the names, you will need to update all the pivot tables in the workbook. In the ribbon at the top of Excel, navigate to Data > Connections and hit Refresh All.
 6. With the names replaced and the pivot tables updated, you can now hide the raw data and then save your PPR. To hide the data tab, right click on the RawData tab and select hide.
