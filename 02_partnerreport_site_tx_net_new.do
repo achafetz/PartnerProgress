@@ -61,7 +61,7 @@
 		replace fy2016_targets_nn = . if fy2016_targets==. & fy2015q4==.
 	drop *_cc
 	*replace raw period values with generated net_new values
-	foreach x in fy2016q2 fy2016q4 fy2016_targets {
+	foreach x in fy2016q4 fy2016_targets {
 		replace `x' = `x'_nn if indicator=="TX_NET_NEW"
 		drop `x'_nn
 		}
@@ -77,8 +77,7 @@
 	foreach agg in "sapr" "cum" {
 		if "`agg'"=="sapr" egen fy2016`agg' = rowtotal(fy2016q1 fy2016q2)
 			else egen fy2016`agg' = rowtotal(fy2016q*)
-		replace fy2016`agg' = fy2016q`i' if inlist(indicator, "TX_CURR", ///
-			"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR")
+		replace fy2016`agg' = fy2016q`i' if inidcator=="TX_CURR"
 		replace fy2016`agg' =. if fy2016`agg'==0 //should be missing
 		local i = `i' + 2
 		}
@@ -99,14 +98,14 @@
 
 *create retained on TX variable (TX_NET_NEW - TX_NEW) --> dataset needs to be wide
 	*collapse so only one observation per site
-		collapse (sum) fy2015q2 fy2015apr fy2016_targets fy2016apr, ///
+		collapse (sum) fy2015q2 fy2015apr fy2016_targets fy2016sapr fy2016apr, ///
 			by(region operatingunit countryname psnu psnuuid snuprioritization ///
 			facilityuid facilityprioritization indicator fundingagency ///
 			implementingmechanismname)
 	*reshape wide
 		*drop if typemilitary=="Y"
 		*egen id = group(psnuuid mechanismid primepartner communityuid facilityuid indicatortype) 
-		reshape wide fy2015q2 fy2015apr fy2016_targets fy2016apr, ///
+		reshape wide fy2015q2 fy2015apr fy2016_targets fy2016sapr fy2016apr, ///
 			i(operatingunit countryname facilityuid fundingagency implementingmechanismname) ///
 			j(indicator, string)
 	*create copy periods to replace "." w/ 0 for generating net new (if . using in calc --> answer == .)
@@ -129,7 +128,7 @@
 *new variable - site exits for TX_CURR in both SAPR and APR
 	*have to collapse up partners to site level and then merge back in
 	preserve
-	collapse (sum) fy2015apr fy2016apr if indicator=="TX_CURR", ///
+	collapse (sum) fy2015apr fy2016sapr fy2016apr if indicator=="TX_CURR", ///
 		by(operatingunit facilityuid)
 	gen bothpds = 0
 		replace bothpds = 1 if (!inlist(fy2015apr, ., 0) & ///
@@ -149,7 +148,7 @@
 	local vars region operatingunit countryname psnu psnuuid snuprioritization ///
 		fundingagency implementingmechanismname facilityuid ///
 		facilityprioritization indicator ///
-		fy2015q2 fy2015apr fy2016_targets fy2016apr fy2016apr_tx_ret bothpds
+		fy2015q2 fy2015apr fy2016_targets fy2016sapr fy2016apr fy2016apr_tx_ret bothpds
 	keep `vars' 
 	order `vars'  
 
