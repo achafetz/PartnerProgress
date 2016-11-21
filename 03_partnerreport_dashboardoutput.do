@@ -72,7 +72,7 @@
 		disaggregate=="Known/New"
 
 	*TX_NET_NEW indicator
-			expand 2 if indicator=="TX_CURR" & , gen(new) //create duplicate of TX_CURR
+			expand 2 if key_ind=="TX_CURR" & , gen(new) //create duplicate of TX_CURR
 			replace key_ind= "TX_NET_NEW" if new==1 //rename duplicate TX_NET_NEW
 			drop new
 		*create copy periods to replace "." w/ 0 for generating net new (if . using in calc --> answer == .)
