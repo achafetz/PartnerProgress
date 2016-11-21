@@ -18,7 +18,7 @@
 *Which outputs to produce? 0 = No, 1 = Yes
 	global global_output 0	 //full global dataset
 	global ctry_output 1 	//one dataset for every OU
-	global sel_output 1	//just an outut for select OU specified below
+	global sel_output 0	//just an outut for select OU specified below
 	global sel_output_list "Mozambique"  //OU selection
 	global site_app 0 //append site data
 	
@@ -114,10 +114,8 @@
 			local i = `i' + 2
 			}
 			*end
-		*delete after checking
-		*does fy2016apr = fycum?
-		*table indicator, c(sum fy2016apr sum fy2016cum) format(%13.0fc)
 		replace fy2016cum = fy2016apr
+		
 *delete reporting that shouldn't have occured
 	/*
 	tabstat fy2015q3 fy2016q1 fy2016q3 if inlist(indicator, "TX_CURR", ///
