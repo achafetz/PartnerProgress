@@ -3,7 +3,7 @@
 **   Aaron Chafetz & Josh Davis
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 11/18/2016
+**   Updated: 11/21/2016
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM_20160822 [ICPI Data Store]
@@ -20,13 +20,13 @@
 	global ctry_output 1 	//one dataset for every OU
 	global sel_output 1	//just an outut for select OU specified below
 	global sel_output_list "Mozambique"  //OU selection
-	global site_app 1 //append site data
+	global site_app 0 //append site data
 	
 *set today's date for saving
 	global date = subinstr("`c(current_date)'", " ", "", .)
 	
 *set date of frozen instance - needs to be changed w/ updated data
-	global datestamp "20161010"
+	global datestamp "20161115"
 	
 *import/open data
 	capture confirm file "$output\ICPIFactView_SNUbyIM${datestamp}.dta"
@@ -49,8 +49,8 @@
 		"PMTCT_STAT", "PMTCT_ARV", "PMTCT_EID", "TX_NEW", "TX_CURR", ///
 		"OVC_SERV", "VMMC_CIRC") | inlist(indicator, "TB_STAT", "TB_ART", ///
 		"KP_PREV", "PP_PREV", "CARE_CURR", "TX_RET", "TX_VIRAL", "TX_UNDETECT", ///
-		"GEND_GBV")) | inlist(indicator, "GEND_NORM", "KP_MAT", "PMTCT_FO", ///
-		"TB_SCREEN") & disaggregate=="Total Numerator"
+		"GEND_GBV") | inlist(indicator, "GEND_NORM", "KP_MAT", "PMTCT_FO", ///
+		"TB_SCREEN")) & disaggregate=="Total Numerator"
 	
 	*denominators
 	foreach x in "TB_STAT" "TB_ART"{
@@ -73,7 +73,7 @@
 
 	*TX_NET_NEW indicator
 			expand 2 if indicator=="TX_CURR" & , gen(new) //create duplicate of TX_CURR
-			replace indicator= "TX_NET_NEW" if new==1 //rename duplicate TX_NET_NEW
+			replace key_ind= "TX_NET_NEW" if new==1 //rename duplicate TX_NET_NEW
 			drop new
 		*create copy periods to replace "." w/ 0 for generating net new (if . using in calc --> answer == .)
 		foreach x in fy2015q4 fy2016q2 fy2016q4 fy2016_targets{
@@ -91,13 +91,13 @@
 		drop *_cc
 		*replace raw period values with generated net_new values
 		foreach x in fy2016q2 fy2016q4 fy2016_targets {
-			replace `x' = `x'_nn if indicator=="TX_NET_NEW"
+			replace `x' = `x'_nn if key_ind=="TX_NET_NEW"
 			drop `x'_nn
 			}
 			*end
 		*remove tx net new values for fy15
 		foreach pd in fy2015q2 fy2015q3 fy2015q4 fy2015apr {
-			replace `pd' = . if indicator=="TX_NET_NEW"
+			replace `pd' = . if key_ind=="TX_NET_NEW"
 			}
 			*end
 			
@@ -106,7 +106,7 @@
 		foreach agg in "sapr" "cum" {
 			if "`agg'"=="sapr" egen fy2016`agg' = rowtotal(fy2016q1 fy2016q2)
 				else egen fy2016`agg' = rowtotal(fy2016q*)
-			replace fy2016`agg' = fy2016q`i' if inlist(indicator, "TX_CURR", ///
+			replace fy2016`agg' = fy2016q`i' if inlist(key_ind, "TX_CURR", ///
 				"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR", ///
 				"TB_ART", "TX_RET", "TX_VIRAL") | inlist("TX_UNDETECT", ///
 				"GEND_GBV", "GEND_NORM", "KP_MAT", "PMTCT_FO", "TB_SCREEN")
@@ -115,9 +115,9 @@
 			}
 			*end
 		*delete after checking
-		does fy2016apr = fycum?
-		table indicator, c(sum fy2016apr sum fy2016cum)
-
+		*does fy2016apr = fycum?
+		*table indicator, c(sum fy2016apr sum fy2016cum) format(%13.0fc)
+		replace fy2016cum = fy2016apr
 *delete reporting that shouldn't have occured
 	/*
 	tabstat fy2015q3 fy2016q1 fy2016q3 if inlist(indicator, "TX_CURR", ///
@@ -126,7 +126,7 @@
 	*/
 	ds *q1 *q3
 	foreach pd in `r(varlist)'{
-		replace `pd'=. if inlist(indicator, "TX_CURR", ///
+		replace `pd'=. if inlist(key_ind, "TX_CURR", ///
 			"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR", ///
 			"TB_ART", "TX_RET", "TX_VIRAL") | inlist("TX_UNDETECT", ///
 			"GEND_GBV", "GEND_NORM", "KP_MAT", "PMTCT_FO", "TB_SCREEN")
