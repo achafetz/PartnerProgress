@@ -1,4 +1,4 @@
-**   EA Outlier Analysis
+**   Partner Performance Report
 **   COP FY16
 **   Aaron Chafetz
 **   Purpose: Initialize folder structure and global file paths

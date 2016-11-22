@@ -1,4 +1,4 @@
-**   Partner Performance by SNU
+**   Partner Performance Report
 **   COP FY16
 **   Aaron Chafetz
 **   Purpose: generate site level aggre

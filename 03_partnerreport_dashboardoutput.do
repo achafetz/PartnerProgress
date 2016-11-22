@@ -16,8 +16,8 @@
 ********************************************************************************
 
 *Which outputs to produce? 0 = No, 1 = Yes
-	global global_output 0	 //full global dataset
-	global ctry_output 1 	//one dataset for every OU
+	global global_output 1	 //full global dataset
+	global ctry_output 0 	//one dataset for every OU
 	global sel_output 0	//just an outut for select OU specified below
 	global sel_output_list "Mozambique"  //OU selection
 	global site_app 0 //append site data
@@ -50,7 +50,7 @@
 		"OVC_SERV", "VMMC_CIRC") | inlist(indicator, "TB_STAT", "TB_ART", ///
 		"KP_PREV", "PP_PREV", "CARE_CURR", "TX_RET", "TX_VIRAL", "TX_UNDETECT", ///
 		"GEND_GBV") | inlist(indicator, "GEND_NORM", "KP_MAT", "PMTCT_FO", ///
-		"TB_SCREEN")) & disaggregate=="Total Numerator"
+		"TB_SCREEN", "KP_MAT", "OVC_ACC")) & disaggregate=="Total Numerator"
 	
 	*denominators
 	foreach x in "TB_STAT" "TB_ART"{
@@ -153,7 +153,17 @@
 		}
 	order facilityuid facilityprioritization, before(indicator)
 	
-	
+*update all partner and mech to offical names (based on FACTS Info)
+	capture confirm file "$output\officialnames.dta"
+	if _rc{
+		perserve
+		run 06_partnerreport_officalnames
+		restore
+		}
+		*end
+	merge m:1 mechanismid using "$output\officialnames.dta", ///
+		update replace nogen keep(1 3 4 5) //keep all but non match from using
+
 *export full dataset
 	if $global_output == 1 {
 		di "GLOBAL OUTPUT"
