@@ -12,20 +12,15 @@
 
 *set date of frozen instance - needs to be changed w/ updated data
 	local datestamp "20161115"
-
+	
 *import/open data
-	capture confirm file "$output\ICPIFactView_IMPATT`datestamp'.dta"
-		if !_rc{
-			use "$output\ICPIFactView_IMPATT`datestamp'.dta", clear
-		}
-		else{
-			*import delimited "$data\ICPI_Fact_view_NAT_SUBNAT_`datestamp'.txt", clear
-			import excel "$data\ICPI_Fact_view_NAT_SUBNAT_`datestamp'.xlsx", ///
-				firstrow case(lower) clear
-			}
-	*end
+	import excel "$data\ICPI_Fact_view_NAT_SUBNAT_`datestamp'.xlsx", ///
+		firstrow case(lower) clear
 
-	keep if inlist(indicator, "POP_NUM", "PLHIV")
+*keep just pop and plhiv
+	keep if inlist(indicator, "POP_NUM", "PLHIV") & disaggregate=="Total Numerator"
 	replace indicator = "PLHIV_NUM" if indicator=="PLHIV"
 	keep region operatingunit countryname psnu psnuuid snuprioritization ///
 		indicator value
+		
+	br

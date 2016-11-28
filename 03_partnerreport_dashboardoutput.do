@@ -16,10 +16,10 @@
 ********************************************************************************
 
 *Which outputs to produce? 0 = No, 1 = Yes
-	global global_output 1	 //full global dataset
+	global global_output 0	 //full global dataset
 	global ctry_output 0 	//one dataset for every OU
 	global sel_output 0	//just an outut for select OU specified below
-	global sel_output_list "Mozambique"  //OU selection
+	global sel_output_list "Asia Regional Program"  //OU selection
 	global site_app 0 //append site data
 	
 *set today's date for saving
@@ -86,11 +86,13 @@
 			replace fy2016q2_nn = . if (fy2016q2==. & fy2015q4==.)
 		gen fy2016q4_nn = fy2016q4_cc-fy2016q2_cc
 			replace fy2016q4_nn = . if (fy2016q4==. & fy2016q2==.)
+		egen fy2016apr_nn = rowtotal(fy2016q2_nn fy2016q4_nn)
 		gen fy2016_targets_nn = fy2016_targets_cc - fy2015q4_cc
 			replace fy2016_targets_nn = . if fy2016_targets==. & fy2015q4==.
+			
 		drop *_cc
 		*replace raw period values with generated net_new values
-		foreach x in fy2016q2 fy2016q4 fy2016_targets {
+		foreach x in fy2016q2 fy2016q4 fy2016apr fy2016_targets {
 			replace `x' = `x'_nn if key_ind=="TX_NET_NEW"
 			drop `x'_nn
 			}
@@ -108,7 +110,7 @@
 				else egen fy2016`agg' = rowtotal(fy2016q*)
 			replace fy2016`agg' = fy2016q`i' if inlist(key_ind, "TX_CURR", ///
 				"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR", ///
-				"TB_ART", "TX_RET", "TX_VIRAL") | inlist("TX_UNDETECT", ///
+				"TB_ART", "TX_RET", "TX_VIRAL") | inlist(key_ind, "TX_UNDETECT", ///
 				"GEND_GBV", "GEND_NORM", "KP_MAT", "PMTCT_FO", "TB_SCREEN")
 			replace fy2016`agg' =. if fy2016`agg'==0 //should be missing
 			local i = `i' + 2
@@ -190,3 +192,18 @@
 			}
 			}
 			*end
+
+*****
+*KP output
+/*
+preserve
+import excel "Documents/KP PREV IMs.xlsx", allstring firstrow clear
+save "$output/kpmechs", replace
+restore
+preserve
+merge m:1 mechanismid using "$output/kpmechs", nogen keep(match)
+qui: export delimited using "$excel\ICPIFactView_SNUbyIM_${date}_KPmechs", ///
+	nolabel replace dataf
+restore
+*/
+
