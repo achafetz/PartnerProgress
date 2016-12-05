@@ -3,7 +3,7 @@
 **   Aaron Chafetz & Josh Davis
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 11/21/2016
+**   Updated: 12/5/2016
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM_20160822 [ICPI Data Store]
@@ -16,11 +16,12 @@
 ********************************************************************************
 
 *Which outputs to produce? 0 = No, 1 = Yes
-	global global_output 0	 //full global dataset
+	global global_output 0 //full global dataset
 	global ctry_output 0 	//one dataset for every OU
 	global sel_output 0	//just an outut for select OU specified below
 	global sel_output_list "Asia Regional Program"  //OU selection
-	global site_app 0 //append site data
+	global site_app 1 //append site data
+	global tx_output 1 //global output for TX_NET_NEW tool
 	
 *set today's date for saving
 	global date = subinstr("`c(current_date)'", " ", "", .)
@@ -192,6 +193,17 @@
 			}
 			}
 			*end
+
+*TX_NET_NEW SITE output
+	if $tx_output == 1{
+		di "TX_NET_NEW TOOL OUTPUT"
+		preserve
+		keep if inlist(indicator, "TX_CURR", "TX_NEW", "TX_NET_NEW")
+		qui: export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL_TX_${date}", ///
+			nolabel replace dataf
+		restore
+		}
+		*end
 
 *****
 *KP output

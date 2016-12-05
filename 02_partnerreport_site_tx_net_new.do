@@ -3,7 +3,7 @@
 **   Aaron Chafetz
 **   Purpose: generate site level aggre
 **   Date: September 22, 2016
-**   Updated: 11/3
+**   Updated: 12/5/16
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM_20160822 [ICPI Data Store]
@@ -14,7 +14,7 @@
 ********************************************************************************
 
 *set date of frozen instance - needs to be changed w/ updated data
-	global datestamp "20160915"
+	global datestamp "20161115_Q4v1_2"
 	
 *set today's date for saving
 	global date = subinstr("`c(current_date)'", " ", "", .)
@@ -77,7 +77,7 @@
 	foreach agg in "sapr" "cum" {
 		if "`agg'"=="sapr" egen fy2016`agg' = rowtotal(fy2016q1 fy2016q2)
 			else egen fy2016`agg' = rowtotal(fy2016q*)
-		replace fy2016`agg' = fy2016q`i' if inidcator=="TX_CURR"
+		replace fy2016`agg' = fy2016q`i' if indicator=="TX_CURR"
 		replace fy2016`agg' =. if fy2016`agg'==0 //should be missing
 		local i = `i' + 2
 		}

@@ -3,7 +3,7 @@
 **   Aaron Chafetz
 **   Purpose: create an aggregate site dataset for TX_CURR & TX_NEW
 **   Date: October 11, 2016
-**   Updated: 11/3/16
+**   Updated: 12/5/16
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM_20160915 [ICPI Data Store]
@@ -14,15 +14,15 @@
 ********************************************************************************
 
 *set date of frozen instance - needs to be changed w/ updated data
-	global datestamp "20161010"
+	global datestamp "20161115_Q4v1_2"
 
 * unzip folder containing all site data
 	cd "C:\Users\achafetz\Documents\ICPI\Data"
-	global folder "ALL Site Dataset ${datestamp}"
+	global folder "All Site Dataset ${datestamp}"
 	unzipfile "$folder"
 	
 *convert files from txt to dta for appending and keep only TX_CURR and TX_NEW (total numerator)
-	cd "C:\Users\achafetz\Documents\ICPI\Data\ALL Site Dataset ${datestamp}""
+	cd "C:\Users\achafetz\Documents\ICPI\Data\All Site Dataset ${datestamp}"
 	fs 
 	foreach ou in `r(files)'{
 		di "import/save: `ou'"
@@ -38,12 +38,11 @@
 	append using `r(files)', force
 	
 *save all site file
-	local datestamp "20160915"
-	save "$output\ICPIFactView_ALLTX_Site_IM${datestamp}"", replace
+	save "$output\ICPIFactView_ALLTX_Site_IM${datestamp}", replace
 	
 *delete files
 	fs *.dta 
-	erase `r(files)'
+	erase "`r(files)'"
 	fs *.txt
 	erase `r(files)'
-	rmdir "C:\Users\achafetz\Documents\ICPI\Data\ALL Site Dataset ${datestamp}"\"
+	rmdir "C:\Users\achafetz\Documents\ICPI\Data\All Site Dataset ${datestamp}"\"
