@@ -50,6 +50,9 @@
 	global output "$projectpath/StataOutput"
 	global graph "$projectpath/StataFigures"
 	global excel "$projectpath/ExcelOutput"
+	*this folders path is in a seperate file location due to data size and usage
+	*you can change these directories to point to $data on your machine
+	global fvdata "C:/Users/achafetz/Documents/ICPI/Data"
 	disp as error "If initial setup, move data to RawData folder."
 
 ********************************************************************************

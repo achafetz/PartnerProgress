@@ -1,6 +1,6 @@
 **   Partner Performance by SNU
 **   COP FY16
-**   Aaron Chafetz & Josh Davis
+**   Aaron Chafetz
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
 **   Updated: 12/5/2016
@@ -16,31 +16,33 @@
 ********************************************************************************
 
 *Which outputs to produce? 0 = No, 1 = Yes
-	global global_output 0 //full global dataset
-	global ctry_output 0 	//one dataset for every OU
+	global global_output 1 //full global dataset
+	global ctry_output 1 	//one dataset for every OU
 	global sel_output 0	//just an outut for select OU specified below
 	global sel_output_list "Asia Regional Program"  //OU selection
-	global site_app 1 //append site data
-	global tx_output 1 //global output for TX_NET_NEW tool
+	global site_app 0 //append site data
+	global tx_output 0 //global output for TX_NET_NEW tool
 	
 *set today's date for saving
 	global date = subinstr("`c(current_date)'", " ", "", .)
 	
 *set date of frozen instance - needs to be changed w/ updated data
-	global datestamp "20161115"
+	global datestamp "20161230_v2_2"
 	
 *import/open data
-	capture confirm file "$output\ICPIFactView_SNUbyIM${datestamp}.dta"
+	capture confirm file "$fvdata/ICPI_FactView_PSNU_IM_${datestamp}.dta"
 		if !_rc{
-			use "$output\ICPIFactView_SNUbyIM${datestamp}.dta", clear
+			use "$fvdata/ICPI_FactView_PSNU_IM_${datestamp}.dta", clear
 		}
 		else{
-			import delimited "$data\ICPI_Fact_View_PSNU_IM_${datestamp}.txt", clear
-			save "$output\ICPIFactView_SNUbyIM${datestamp}.dta", replace
+			import delimited "$fvdata/ICPI_FactView_PSNU_IM_${datestamp}.txt", clear
+			save "$fvdata/ICPI_FactView_PSNU_IM_${datestamp}.dta", replace
 		}
 	*end
-
-*replace missing SNU prioritizatoins
+	
+*SNU prioritizations
+	drop fy17snuprioritization
+	rename fy16snuprioritization snuprioritization
 	replace snuprioritization="[not classified]" if snuprioritization==""
 
 *create new indicator variable for only the ones of interest for analysis
@@ -157,6 +159,7 @@
 	order facilityuid facilityprioritization, before(indicator)
 	
 *update all partner and mech to offical names (based on FACTS Info)
+	tostring mechanismid, replace
 	capture confirm file "$output\officialnames.dta"
 	if _rc{
 		perserve
