@@ -47,6 +47,8 @@
 			preserve
 			import delimited "$data/2017_01_26__PSNU_IM_MCAD.txt", clear
 			rename region ïregion
+			replace disaggregate = "Age/Sex Aggregated" if disaggregate=="Age/Sex"
+			replace disaggregate = "Age/Sex Aggregated/Result" if disaggregate=="Age/Sex/Result"
 			save "$output/PSNU_IM_MCAD_20170126.dta", replace
 			restore
 		}
