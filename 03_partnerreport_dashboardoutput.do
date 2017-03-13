@@ -3,15 +3,12 @@
 **   Aaron Chafetz
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 12/5/2016
+**   Updated: 3/13/17
 
 /* NOTES
-	- Data source: ICPI_Fact_View_PSNU_IM_20160822 [ICPI Data Store]
-	- Report uses FY2016APR results since it sums up necessary values
+	- Data source: ICPI_Fact_View_PSNU_IM  [ICPI Data Store]
 	- Report aggregates DSD and TA
-	- Report looks across HTC_TST, HTC_TST_POS, PMTCT_STAT, PMTCT_STAT_POS, 
-		PMTCT_ARV, PMTCT_EID, TB_STAT, TB_STAT_POS, TB_ART, TX_NEW, TX_CURR,
-		OVC_SERV, VMMC_CIRC, KP_PREV, PP_PREV, and CARE_CURR
+	- Report uses Totals and MCAD
 */
 ********************************************************************************
 
@@ -27,7 +24,7 @@
 	global date = subinstr("`c(current_date)'", " ", "", .)
 	
 *set date of frozen instance - needs to be changed w/ updated data
-	global datestamp "20161230_v2_2"
+	global datestamp "20170215_v1_1"
 	
 *import/open data
 	capture confirm file "$fvdata/ICPI_FactView_PSNU_IM_${datestamp}.dta"
@@ -41,45 +38,45 @@
 	*end
 	
 *SNU prioritizations
-	drop fy17snuprioritization
-	rename fy16snuprioritization snuprioritization
+	drop fy16snuprioritization
+	rename fy17snuprioritization snuprioritization
 	replace snuprioritization="[not classified]" if snuprioritization==""
 
 *create new indicator variable for only the ones of interest for analysis
 	* for most indicators we just want their Total Numerator reported
 	* exceptions = HTC_TST Positives & TX_NET_NEW --> need to "create" new var
-	gen key_ind=indicator if (inlist(indicator, "HTC_TST", "CARE_NEW", ///
-		"PMTCT_STAT", "PMTCT_ARV", "PMTCT_EID", "TX_NEW", "TX_CURR", ///
-		"OVC_SERV", "VMMC_CIRC") | inlist(indicator, "TB_STAT", "TB_ART", ///
-		"KP_PREV", "PP_PREV", "CARE_CURR", "TX_RET", "TX_VIRAL", "TX_UNDETECT", ///
-		"GEND_GBV") | inlist(indicator, "GEND_NORM", "KP_MAT", "PMTCT_FO", ///
-		"TB_SCREEN", "KP_MAT", "OVC_ACC")) & disaggregate=="Total Numerator"
-	
-	*denominators
-	foreach x in "TB_STAT" "TB_ART"{
-		replace key_ind = "`x'_D" if indicator=="`x'" & ///
-		disaggregate=="Total Denominator"
+	gen key_ind=indicator if ///
+		(inlist(indicator, "HTS_TST" "HTS_TST_POS", ///
+			"PMTCT_STAT", "PMTCT_ART", "PMTCT_EID", "TX_NEW", "TX_CURR", ///
+			"VMMC_CIRC")) & disaggregate=="Total Numerator"
+		/*inlist(indicator, "KP_PREV", "PP_PREV", "OVC_HIVSTAT", "OVC_SERV", ///
+				"TB_ART", "TB_STAT", "TX_TB") ///
+			inlist(indicator, "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT") ///  */
+	/*	
+	*denominators (semi-annually)
+		foreach x in "TB_STAT" "TB_ART"{
+			replace key_ind = "`x'_D" if indicator=="`x'" & ///
+			disaggregate=="Total Denominator"
 		}
 		*end
+	*TB_STAT_POS indicator
+		replace key_ind="TB_STAT_POS" if indicator=="TB_STAT" & ///
+			resultstatus=="Positive" & disaggregate=="Result"
+	*/
 	
-	*HTC_TST_POS & TB_STAT_POS indicator
-	replace disaggregate="Results" if disaggregate=="Result"
-	foreach x in "HTC_TST" "TB_STAT" {
-		replace key_ind="`x'_POS" if indicator=="`x'" & ///
-		resultstatus=="Positive" & disaggregate=="Results"
-		}
-		*end
-		
 	*PMTCT_STAT_POS
 	replace key_ind="PMTCT_STAT_POS" if indicator=="PMTCT_STAT" & ///
-		disaggregate=="Known/New"
+		disaggregate=="Age/KnownNewResult"
+	
+	*MCAD indicators disaggs
+	replace key_ind=indicator if ismcad=="Y"& inlist(age, "<15", "15+") & sex!="" 
 
 	*TX_NET_NEW indicator
 			expand 2 if key_ind=="TX_CURR" & , gen(new) //create duplicate of TX_CURR
 			replace key_ind= "TX_NET_NEW" if new==1 //rename duplicate TX_NET_NEW
 			drop new
 		*create copy periods to replace "." w/ 0 for generating net new (if . using in calc --> answer == .)
-		foreach x in fy2015q4 fy2016q2 fy2016q4 fy2016_targets{
+		foreach x in fy2015q4 fy2016q2 fy2016q4 fy2016_targets fy2017q1 fy2017_targets{
 			clonevar `x'_cc = `x'
 			recode `x'_cc (. = 0)
 			}
@@ -92,10 +89,13 @@
 		egen fy2016apr_nn = rowtotal(fy2016q2_nn fy2016q4_nn)
 		gen fy2016_targets_nn = fy2016_targets_cc - fy2015q4_cc
 			replace fy2016_targets_nn = . if fy2016_targets==. & fy2015q4==.
-			
+		gen fy2017q1_nn = fy2017q1_cc-fy2016q4_cc
+			replace fy2017q1_nn = . if (fy2017q1==. & fy2016q4==.)
+		gen fy2017_targets_nn = fy2017_targets_cc - fy2016q4_cc
+			replace fy2017_targets_nn = . if fy2017_targets==. & fy2016q4==.	
 		drop *_cc
 		*replace raw period values with generated net_new values
-		foreach x in fy2016q2 fy2016q4 fy2016apr fy2016_targets {
+		foreach x in fy2016q2 fy2016q4 fy2016apr fy2016_targets fy2017q1 fy2017_targets{
 			replace `x' = `x'_nn if key_ind=="TX_NET_NEW"
 			drop `x'_nn
 			}
@@ -106,45 +106,40 @@
 			}
 			*end
 			
-	*create SAPR and cumulative variable to sum up necessary variables
-		local i 2
-		foreach agg in "sapr" "cum" {
-			if "`agg'"=="sapr" egen fy2016`agg' = rowtotal(fy2016q1 fy2016q2)
-				else egen fy2016`agg' = rowtotal(fy2016q*)
-			replace fy2016`agg' = fy2016q`i' if inlist(key_ind, "TX_CURR", ///
-				"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR", ///
-				"TB_ART", "TX_RET", "TX_VIRAL") | inlist(key_ind, "TX_UNDETECT", ///
-				"GEND_GBV", "GEND_NORM", "KP_MAT", "PMTCT_FO", "TB_SCREEN")
-			replace fy2016`agg' =. if fy2016`agg'==0 //should be missing
-			local i = `i' + 2
-			}
-			*end
-		replace fy2016cum = fy2016apr
-		
+	*create cumulative variable to sum up necessary variables
+		egen fy2017cum = rowtotal(fy2017q*)
+		/*for Q2
+		local i 2 
+		replace fy2017cum = fy2017q`i' if inlist(indicator, "KP_PREV", ///
+			"PP_PREV", "OVC_HIVSTAT", "OVC_SERV", "TB_ART", "TB_STAT", ///
+			"TX_TB") | inlist(indicator, "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT")
+		replace fy2017cum =. if fy2017cum==0 //should be missing
+		capture confirm variable fy2017apr
+			if !_rc replace fy2017cum = fy2017apr
+		*/
 *delete reporting that shouldn't have occured
-	/*
-	tabstat fy2015q3 fy2016q1 fy2016q3 if inlist(indicator, "TX_CURR", ///
-		"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR"), ///
-		s(sum count) by(operatingunit)
-	*/
 	ds *q1 *q3
 	foreach pd in `r(varlist)'{
-		replace `pd'=. if inlist(key_ind, "TX_CURR", ///
-			"OVC_SERV", "PMTCT_ARV", "KP_PREV", "PP_PREV", "CARE_CURR", ///
-			"TB_ART", "TX_RET", "TX_VIRAL") | inlist("TX_UNDETECT", ///
-			"GEND_GBV", "GEND_NORM", "KP_MAT", "PMTCT_FO", "TB_SCREEN")
+		replace `pd'=. if inlist(key_ind, "KP_PREV", "PP_PREV", "OVC_HIVSTAT", ///
+			"OVC_SERV", "TB_ART", "TB_STAT", "TX_TB") | inlist(indicator, ///
+			"GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT")
 		}
 		*end
+		
+* format disaggs
+	gen disagg = "Total" if key_ind!=""
+		replace disagg = age + "/" + sex if key_ind!="" & ///
+			ismcad=="Y"& inlist(age, "<15", "15+") & sex!="" 
+	
 * delete extrainous vars/obs
 	drop if key_ind=="" //only need data on key indicators
 	drop indicator
 	rename ïregion region
 	rename key_ind indicator
-	local vars region operatingunit countryname psnu psnuuid snuprioritization ///
+	local vars disagg operatingunit countryname psnu psnuuid snuprioritization ///
 		fundingagency primepartner mechanismid implementingmechanismname ///
-		indicator fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
-		fy2016q1 fy2016q2 fy2016q2 fy2016sapr fy2016q3 fy2016q4 fy2016apr ///
-		fy2016cum 
+		indicator fy2015apr fy2016_targets fy2016q1 fy2016q2 fy2016q2 ///
+		fy2016q3 fy2016q4 fy2016apr fy2017_targets fy2017q1
 	keep `vars'
 	order `vars'
 
