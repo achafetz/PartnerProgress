@@ -11,7 +11,7 @@
 ********************************************************************************
 
 *set date of frozen instance - needs to be changed w/ updated data
-	global datestamp "20170215_v1_1"
+	global datestamp "20170324_v2_1"
 	
 *import/open data
 	import delimited "$fvdata\ICPI_FactView_NAT_SUBNAT_${datestamp}.txt", ///
@@ -23,6 +23,7 @@
 	replace indicator = "POP_NUM" if indicator=="POP_EST (SUBNAT)"
 	keep ïregion operatingunit countryname psnu psnuuid fy17snuprioritization ///
 		indicator fy2017
+	drop if fy2017 ==""
 	sort operatingunit psnu	
 	br 
 

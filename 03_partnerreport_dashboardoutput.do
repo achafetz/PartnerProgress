@@ -3,7 +3,7 @@
 **   Aaron Chafetz
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 3/23/17
+**   Updated: 4/4/17
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM  [ICPI Data Store]
@@ -15,7 +15,7 @@
 *Which outputs to produce? 0 = No, 1 = Yes
 	global global_output 0 //full global dataset
 	global ctry_output 1 	//one dataset for every OU
-	global sel_output 1	//just an outut for select OU specified below
+	global sel_output 0	//just an outut for select OU specified below
 	global sel_output_list "Uganda"  //OU selection
 	global site_app 0 //append site data
 	global tx_output 0 //global output for TX_NET_NEW tool
@@ -24,7 +24,7 @@
 	global date = subinstr("`c(current_date)'", " ", "", .)
 	
 *set date of frozen instance - needs to be changed w/ updated data
-	global datestamp "20170215_v1_1"
+	global datestamp "20170324_v2_2"
 	
 *import/open data
 	capture confirm file "$fvdata/ICPI_FactView_PSNU_IM_${datestamp}.dta"
@@ -73,7 +73,7 @@
 	*MCAD indicators disaggs
 	replace key_ind=indicator if ismcad=="Y" & inlist(age, "<15", "15+") ///
 		& indicator!="HTS_TST_NEG" & sex!=""
-	replace fy2017_targets=. if key_ind=="HTS_TST" & ismcad=="Y"
+	*replace fy2017_targets=. if key_ind=="HTS_TST" & ismcad=="Y"
 
 	*TX_NET_NEW indicator
 		expand 2 if key_ind== "TX_CURR", gen(new) //create duplicate of TX_CURR
