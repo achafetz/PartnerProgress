@@ -3,7 +3,7 @@
 **   Aaron Chafetz
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 4/4/17
+**   Updated: 4/12/17
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM  [ICPI Data Store]
@@ -13,8 +13,8 @@
 ********************************************************************************
 
 *Which outputs to produce? 0 = No, 1 = Yes
-	global global_output 0 //full global dataset
-	global ctry_output 1 	//one dataset for every OU
+	global global_output 1 //full global dataset
+	global ctry_output 0 	//one dataset for every OU
 	global sel_output 0	//just an outut for select OU specified below
 	global sel_output_list "Uganda"  //OU selection
 	global site_app 0 //append site data
