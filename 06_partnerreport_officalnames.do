@@ -30,13 +30,13 @@ global datetime "201704170951"
 		
 	local copyr 2014
 	foreach v of varlist D F H J {
-		rename `v' implementingmechanism`copyr'
+		rename `v' implementingmechanismname`copyr'
 		local copyr = `copyr' + 1
 		}
 		*end
 
 *figure out latest name for IM and partner (should both be from the same year)
-	foreach y in primepartner implementingmechanism{
+	foreach y in primepartner implementingmechanismname{
 		gen `y' = ""
 		gen `y'yr =.
 		foreach x in 2014 2015 2016 2017{
@@ -47,7 +47,7 @@ global datetime "201704170951"
 			*end
 
 *keep only necessary infor	
-	keep mechanismid implementingmechanism primepartner  
+	keep mechanismid implementingmechanismname primepartner  
 
 *save 
 	save "$output/officialnames.dta", replace
