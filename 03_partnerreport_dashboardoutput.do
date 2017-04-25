@@ -1,5 +1,5 @@
 **   Partner Performance by SNU
-**   COP FY16
+**   COP FY17
 **   Aaron Chafetz
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
@@ -168,15 +168,11 @@
 	order facilityuid facilityprioritization, before(indicator)
 	
 *update all partner and mech to offical names (based on FACTS Info)
-	tostring mechanismid, replace
-	capture confirm file "$output\officialnames.dta"
-	if _rc{
-		perserve
-		run 06_partnerreport_officalnames
-		restore
-		}
-		*end
-	merge m:1 mechanismid using "$output\officialnames.dta", ///
+	*tostring mechanismid, replace
+	perserve
+	run 06_partnerreport_officalnames
+	restore
+	merge m:1 mechanismid using "$output/officialnames.dta", ///
 		update replace nogen keep(1 3 4 5) //keep all but non match from using
 
 *export full dataset
