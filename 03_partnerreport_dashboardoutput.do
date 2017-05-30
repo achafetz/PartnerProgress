@@ -3,7 +3,7 @@
 **   Aaron Chafetz
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 4/12/17
+**   Updated: 5/30/17
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM  [ICPI Data Store]
@@ -13,10 +13,10 @@
 ********************************************************************************
 
 *Which outputs to produce? 0 = No, 1 = Yes
-	global global_output 1 //full global dataset
-	global ctry_output 0 	//one dataset for every OU
-	global sel_output 0	//just an outut for select OU specified below
-	global sel_output_list "Uganda"  //OU selection
+	global global_output 0 //full global dataset
+	global ctry_output 1 	//one dataset for every OU
+	global sel_output 1	//just an outut for select OU specified below
+	global sel_output_list "Malawi"  //OU selection
 	global site_app 0 //append site data
 	global tx_output 0 //global output for TX_NET_NEW tool
 
@@ -24,7 +24,7 @@
 	global date = subinstr("`c(current_date)'", " ", "", .)
 	
 *set date of frozen instance - needs to be changed w/ updated data
-	global datestamp "20170324_v2_2"
+	global datestamp "20170515_v1_1"
 	
 *import/open data
 	capture confirm file "$fvdata/ICPI_FactView_PSNU_IM_${datestamp}.dta"
@@ -47,40 +47,29 @@
 	* exceptions = HTC_TST Positives & TX_NET_NEW --> need to "create" new var
 	gen key_ind=indicator if ///
 		(inlist(indicator, "HTS_TST", "HTS_TST_POS", ///
-			"PMTCT_STAT", "PMTCT_ART", "PMTCT_EID", "TX_NEW", "TX_CURR", ///
-			"VMMC_CIRC")) & disaggregate=="Total Numerator"
-		/*inlist(indicator, "KP_PREV", "PP_PREV", "OVC_HIVSTAT", "OVC_SERV", ///
-				"TB_ART", "TB_STAT", "TX_TB") ///
-			inlist(indicator, "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT") ///  */
-	/*	
+			"PMTCT_STAT", "PMTCT_STAT_POS", "PMTCT_ART", "PMTCT_EID", "TX_NEW", "TX_CURR", ///
+			"VMMC_CIRC") | ///
+		inlist(indicator, "KP_PREV", "PP_PREV", "OVC_HIVSTAT", "OVC_SERV", ///
+				"TB_ART", "TB_STAT", "TB_STAT_POS", "TX_TB")) & disaggregate=="Total Numerator"
+		/* inlist(indicator, "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT") ///  */
+		
 	*denominators (semi-annually)
 		foreach x in "TB_STAT" "TB_ART"{
 			replace key_ind = "`x'_D" if indicator=="`x'" & ///
 			disaggregate=="Total Denominator"
 		}
 		*end
-	*TB_STAT_POS indicator
-		replace key_ind="TB_STAT_POS" if indicator=="TB_STAT" & ///
-			resultstatus=="Positive" & disaggregate=="Result"
-	*/
-	
-	*PMTCT_STAT_POS
-	replace key_ind="PMTCT_STAT_POS" if indicator=="PMTCT_STAT" & ///
-		inlist(disaggregate, "Known/New", "Age/KnownNewResult") & ///
-		resultstatus=="Positive"
-		* "Known/New needed for FY16 Results and FY17 Targets (MER 1.0)
 	
 	*MCAD indicators disaggs
 	replace key_ind=indicator if ismcad=="Y" & inlist(age, "<15", "15+") ///
 		& indicator!="HTS_TST_NEG" & sex!=""
-	*replace fy2017_targets=. if key_ind=="HTS_TST" & ismcad=="Y"
 
 	*TX_NET_NEW indicator
 		expand 2 if key_ind== "TX_CURR", gen(new) //create duplicate of TX_CURR
 			replace key_ind= "TX_NET_NEW" if new==1 //rename duplicate TX_NET_NEW
 			drop new
 		*create copy periods to replace "." w/ 0 for generating net new (if . using in calc --> answer == .)
-		foreach x in fy2015q2 fy2015q4 fy2016q2 fy2016q4 fy2017q1 fy2017_targets{
+		foreach x in fy2015q2 fy2015q4 fy2016q2 fy2016q4 fy2017q1 fy2017q2 fy2017_targets{
 			clonevar `x'_cc = `x'
 			recode `x'_cc (. = 0) 
 			}
@@ -95,12 +84,20 @@
 		egen fy2016apr_nn = rowtotal(fy2016q2_nn fy2016q4_nn)
 		gen fy2017q1_nn = fy2017q1_cc-fy2016q4_cc
 			replace fy2017q1_nn = . if (fy2017q1==. & fy2016q4==.)
+		gen fy2017q2_nn = fy2017q2_cc-fy2017q1_cc
+			replace fy2017q2_nn = . if (fy2017q2==. & fy2017q1==.)
+		/* for Q3 and Q4
+		gen fy2017q3_nn = fy2017q3_cc-fy2017q2_cc
+			replace fy2017q3_nn = . if (fy2017q3==. & fy2017q2==.)	
+		gen fy2017q4_nn = fy2017q4_cc-fy2017q3_cc
+			replace fy2017q4_nn = . if (fy2017q4==. & fy2017q3==.)	
+		*/
 		gen fy2017_targets_nn = fy2017_targets_cc - fy2016q4_cc
 			replace fy2017_targets_nn = . if fy2017_targets==. & fy2016q4==.
 		*egen fy2017apr_nn = rowtotal(fy2017q2_nn fy2017q4_nn)
 		drop *_cc
 		*replace raw period values with generated net_new values
-		foreach x in fy2015q4 fy2016q2 fy2016q4 fy2016apr fy2017q1 fy2017_targets{
+		foreach x in fy2015q4 fy2016q2 fy2016q4 fy2016apr fy2017q1 fy2017q2 fy2017_targets{
 			replace `x' = `x'_nn if key_ind=="TX_NET_NEW"
 			drop `x'_nn
 			}
@@ -121,15 +118,16 @@
 	*create cumulative variable to sum up necessary variables
 		egen fy2017cum = rowtotal(fy2017q*)
 			replace fy2017cum = . if fy2017cum==0
-		/*for Q2
+		*for Q2
 		local i 2 
-		replace fy2017cum = fy2017q`i' if inlist(indicator, "KP_PREV", ///
-			"PP_PREV", "OVC_HIVSTAT", "OVC_SERV", "TB_ART", "TB_STAT", ///
-			"TX_TB") | inlist(indicator, "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT")
+		replace fy2017cum = fy2017q`i' if inlist(key_ind, "KP_PREV", ///
+			"PP_PREV", "OVC_HIVSTAT", "OVC_SERV", "TB_ART", "TX_CURR", ///
+			"TB_STAT", "TX_TB") | inlist(key_ind, "GEND_GBV", "PMTCT_FO", ///
+			"TX_RET", "KP_MAT")
 		replace fy2017cum =. if fy2017cum==0 //should be missing
-		capture confirm variable fy2017apr
-			if !_rc replace fy2017cum = fy2017apr
-		*/
+		/*capture confirm variable fy2017apr
+			if !_rc replace fy2017cum = fy2017apr */
+/*	
 *delete reporting that shouldn't have occured
 	ds *q1 *q3
 	foreach pd in `r(varlist)'{
@@ -138,12 +136,14 @@
 			"GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT")
 		}
 		*end
-		
+	*/
+	
 * format disaggs
 	gen disagg = "Total" if key_ind!=""
 		replace disagg = age + "/" + sex if key_ind!="" & ///
-			ismcad=="Y" & inlist(age, "<15", "15+") & sex!="" 
-	
+			ismcad=="Y" & inlist(age, "<15", "15+") & sex!=""
+			
+		
 * delete extrainous vars/obs
 	drop if key_ind=="" //only need data on key indicators
 	drop indicator
@@ -156,7 +156,12 @@
 		fy2017q1 fy2017q2 fy2017q3 fy2017q4 fy2017cum
 	keep `vars'
 	order `vars'
-
+	
+* identify rows with no usable data and drop
+	egen rowtot = rowtotal(fy2016apr fy2017*)
+		drop if rowtot==0
+		drop rowtot
+		
 *append all site
 	if $site_app == 1 {
 		append using "$output\ICPIFactView_SiteIM_${date}_ALLTX"
@@ -169,7 +174,7 @@
 	
 *update all partner and mech to offical names (based on FACTS Info)
 	*tostring mechanismid, replace
-	perserve
+	preserve
 	run 06_partnerreport_officalnames
 	restore
 	merge m:1 mechanismid using "$output/officialnames.dta", ///

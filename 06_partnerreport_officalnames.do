@@ -1,17 +1,17 @@
 **   Partner Performance Report
 **   COP FY17
-**   Aaron Chafetz & Josh Davis
+**   Aaron Chafetz
 **   Purpose: correct naming partner and mechanism names to offical source
 **   Date: November 22, 2016
-**   Updated: 4/17/17
+**   Updated: 5/30/17
 
 /* NOTES
-	- Data source: FACTS Info, April 17, 2017
-	- mechanism partner list COP 2012-2017
+	- Data source: FACTS Info, May 25, 2017
+	- mechanism partner list COP 2014-2017
 */
 ********************************************************************************
 
-global datetime "201704170951"
+global datetime "20170525"
 
 *import data
 	import excel using "$data/FY12-16 Standard COP Matrix Report-${datetime}.xls", ///
