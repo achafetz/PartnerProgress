@@ -3,7 +3,7 @@
 **   Aaron Chafetz
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 5/30/17
+**   Updated: 6/2/17
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM  [ICPI Data Store]
@@ -14,8 +14,9 @@
 
 *Which outputs to produce? 0 = No, 1 = Yes
 	global global_output 0 //full global dataset
-	global ctry_output 1 	//one dataset for every OU
-	global sel_output 1	//just an outut for select OU specified below
+	global equip_output 1 //full global dataset
+	global ctry_output 0 	//one dataset for every OU
+	global sel_output 0	//just an outut for select OU specified below
 	global sel_output_list "Malawi"  //OU selection
 	global site_app 0 //append site data
 	global tx_output 0 //global output for TX_NET_NEW tool
@@ -183,11 +184,21 @@
 *export full dataset
 	if $global_output == 1 {
 		di "GLOBAL OUTPUT"
-		export delimited using "$excel\ICPIFactView_SNUbyIM_GLOBAL_${date}", ///
-		nolabel replace dataf
+		export delimited using "$excel\ICPIFactView_SNUbyIM_${date}_GLOBAL", ///
+			nolabel replace dataf
 		}
 		*end
-	
+		
+*export EQUIP global dataset
+	if $global_output == 1 {
+		di "EQUIP OUTPUT"
+		preserve
+		merge m:1 mechanismid using "$data/equip_mech_list.dta", nogen keep(matched)
+		export delimited using "$excel\ICPIFactView_SNUbyIM_${date}_EQUIP", ///
+			nolabel replace dataf
+		}
+		*end
+		
 *set up to loop through countries
 	if $ctry_output == 1{
 		di "COUNTRY OUTPUT"
