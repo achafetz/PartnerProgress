@@ -13,10 +13,10 @@
 ********************************************************************************
 
 *Which outputs to produce? 0 = No, 1 = Yes
-	global global_output 0 //full global dataset
+	global global_output 1 //full global dataset
 	global equip_output 0 //full global dataset
-	global ctry_output 1 	//one dataset for every OU
-	global sel_output 1	//just an outut for select OU specified below
+	global ctry_output 0 	//one dataset for every OU
+	global sel_output 0	//just an outut for select OU specified below
 	global sel_output_list "Malawi"  //OU selection
 	global site_app 0 //append site data
 	global tx_output 0 //global output for TX_NET_NEW tool
@@ -243,3 +243,5 @@ qui: export delimited using "$excel\ICPIFactView_SNUbyIM_${date}_KPmechs", ///
 restore
 */
 
+
+*export excel "C:\Users\achafetz\Documents\GitHub\PartnerProgress\Reports\GLOBAL_FY17Q2_PartnerProgressReport_v017.06.07.xlsx", sheet("RawData") cell("A2") sheetmodify
