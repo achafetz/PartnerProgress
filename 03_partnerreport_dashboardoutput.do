@@ -3,7 +3,7 @@
 **   Aaron Chafetz
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 6/2/17
+**   Updated: 7/10/17
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM  [ICPI Data Store]
@@ -15,7 +15,7 @@
 *Which outputs to produce? 0 = No, 1 = Yes
 	global global_output 1 //full global dataset
 	global equip_output 0 //full global dataset
-	global ctry_output 0 	//one dataset for every OU
+	global ctry_output 1 	//one dataset for every OU
 	global sel_output 0	//just an outut for select OU specified below
 	global sel_output_list "Malawi"  //OU selection
 	global site_app 0 //append site data
@@ -25,7 +25,7 @@
 	global date = subinstr("`c(current_date)'", " ", "", .)
 	
 *set date of frozen instance - needs to be changed w/ updated data
-	global datestamp "20170515_v1_1"
+	global datestamp "20170702_v2_1"
 	
 *import/open data
 	capture confirm file "$fvdata/ICPI_FactView_PSNU_IM_${datestamp}.dta"
@@ -158,10 +158,11 @@
 	keep `vars'
 	order `vars'
 	
-* identify rows with no usable data and drop
-	egen rowtot = rowtotal(fy2016apr fy2017*)
+/* identify rows with no usable data and drop
+	egen rowtot = rowtotal(fy2015q2 fy2015q4 fy2016apr fy2017*)
 		drop if rowtot==0
 		drop rowtot
+*/ 
 		
 *append all site
 	if $site_app == 1 {
@@ -196,6 +197,7 @@
 		merge m:1 mechanismid using "$data/equip_mech_list.dta", nogen keep(matched)
 		export delimited using "$excel\ICPIFactView_SNUbyIM_${date}_EQUIP", ///
 			nolabel replace dataf
+		restore
 		}
 		*end
 		
