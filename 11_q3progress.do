@@ -35,7 +35,8 @@
 			if !_rc replace fy2017cum = fy2017apr */
 
 ********************************************************************************
-egen kp = rowtotal(fy2016q1 fy2016q2 fy2016q3 fy2016q4 fy2016_targets fy2017q1 fy2017q2 fy2017_targets)
+egen kp = rowtotal(fy2016q1 fy2016q2 fy2016q3 fy2016q4 fy2016_targets ///
+	fy2017q1 fy2017q2 fy2017_targets)
 drop if kp==0
 drop kp
 
@@ -137,7 +138,7 @@ keep if fundingagency=="USAID"
 		drop *_cc
 		*replace raw period values with generated net_new values
 		foreach x in fy2015q4 fy2016q2 fy2016q4 fy2016apr fy2017q1 fy2017q2 fy2017q3 fy2017q4 fy2017apr fy2017_targets{
-			replace `x' = `x'_nn if key_ind=="TX_NET_NEW"
+			replace `x' = `x'_nn if indicator=="TX_NET_NEW"
 			drop `x'_nn
 			}
 			*end
