@@ -35,7 +35,7 @@
 			if !_rc replace fy2017cum = fy2017apr */
 
 ********************************************************************************
-egen kp = rowtotal(fy2016q1 fy2016q2 fy2016q3 fy2016q4 fy2017q1 fy2017q2)
+egen kp = rowtotal(fy2016q1 fy2016q2 fy2016q3 fy2016q4 fy2016_targets fy2017q1 fy2017q2 fy2017_targets)
 drop if kp==0
 drop kp
 
@@ -167,4 +167,4 @@ keep if fundingagency=="USAID"
 		update replace nogen keep(1 3 4 5) //keep all but non match from using
 
 *export
-	export delimited using "$output/progressq3", nolabel replace dataf
+	export delimited using "$excel/progressq3", nolabel replace dataf
