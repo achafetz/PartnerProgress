@@ -1,9 +1,8 @@
 **   Partner Performance
 **   FY1&
 **   Aaron Chafetz
-**   Purpose: project out 
-**   Date: July 20, 2017
-**   Updated:
+**   Purpose: project out APR results 
+**   Updated: July 26, 2017
 
 /* NOTES
 	- builds off structure of PPR base dataset
@@ -27,8 +26,8 @@
 	
 ** WRANGLING **
 
-	*create new indicator variable for only the ones of interest for analysis
-		gen key_ind=indicator if ///
+	*keep only relevant indicators for analysis
+		keep if ///
 			inlist(indicator, "HTS_TST", "HTS_TST_POS", "TX_NEW", "TX_CURR", ///
 			"TX_NET_NEW", "PMTCT_STAT") & disaggregate=="Total Numerator"
 		
@@ -44,7 +43,7 @@
 			replace fy2017cum = . if fy2017cum==0
 		*adjust "snapshot" indicators since they are already cumulative
 		local i 2 
-		replace fy2017cum = fy2017q`i' if inlist(key_ind, "OVC_SERV", ///
+		replace fy2017cum = fy2017q`i' if inlist(indicator, "OVC_SERV", ///
 			"TX_CURR")
 		replace fy2017cum =. if fy2017cum==0 //should be missing, but 0 due to egen
 
@@ -54,12 +53,6 @@
 			drop if kp==0
 			drop kp
 			
-	*remove non-essential variables and rename/reorder indicator
-		drop if key_ind=="" //only need data on key indicators
-		drop indicator
-		rename key_ind indicator
-		order indicator, after(implementingmechanismname)
-
 	*aggregate so there is only one obvervation per mechanism
 		collapse (sum) fy*, by(operatingunit primepartner fundingagency ///
 			mechanismid implementingmechanismname indicator)
@@ -81,13 +74,13 @@
 		egen id = group(operatingunit primepartner fundingagency mechanismid ///
 			implementingmechanismname indicator)
 		reshape long fy, i(id) j(qtr, string)
-		gen qdate = quarterly(qtr, "YQ")
 		drop id
 		
 	*recode 0s to missing due to earlier collapse
 		recode fy (0 = .)
 		
 	*identify groupings for timeseries
+		gen qdate = quarterly(qtr, "YQ")
 		egen pnl = group(operatingunit primepartner fundingagency mechanismid ///
 			implementingmechanismname indicator)
 		egen ind = group(operatingunit indicator)
@@ -126,11 +119,14 @@
 		replace fy = round((1+ ma) * L.fy, 1) if inlist(qdate, 230, 231)
 
 	*drop variables created in process
-		drop qdate ind-ma
-
+		drop qdate ind gr ma_gr_q3_overall-ma
+		rename ma_gr_q3 ma_fy
+		replace ma_fy = round(ma_fy, .001)
 	*reshape back to original fact view setup
-		reshape wide fy, i(pnl) j(qtr, string)
-		drop pnl
+		reshape wide fy ma_fy, i(pnl) j(qtr, string)
+		rename ma_fy2017q3 avg_gr
+		ds ma_*
+		drop `r(varlist)' pnl
 		order operatingunit-indicator
 
 	*merge targets and cumulative variables back in and reorder
@@ -138,6 +134,7 @@
 			implementingmechanismname indicator using "$output/extradata.dta", nogen
 		order fy2015apr fy2016_targets, after(fy2015q4)
 		order fy2016apr fy2017_targets, after(fy2016q4)
+		order avg_gr, after(fy2017cum)
 		
 	*create APR variable
 		egen fy2017apr_p = rowtotal(fy2017q1 fy2017q2 fy2017q3 fy2017q4)
@@ -190,7 +187,25 @@
 			replace `pd' = . if indicator=="TX_NET_NEW"
 			}
 			*end
-			
+
+** Linkage **
+		
+	*linkage = TX_NEW/HTS_TST_POS
+		keep if inlist(indicator, "HTS_TST_POS", "TX_NEW")
+		
+	*reshape for calculation
+		reshape wide fy, i(qtr operatingunit primepartner fundingagency mechanismid implementingmechanismname) j(indicator, string)
+	
+	*calc linkage
+		gen fyLINKAGE = round(fyTX_NEW/fyHTS_TST_POS,.001)
+	
+	*reshape back to long & only keep linkage data
+		reshape long
+		keep if indicator=="LINKAGE" & fy!=.
+		
+	*reshape wide to append to original dataset	
+	
+	
 ** FINAL CLEANUP & EXPORT			
 
 	*delete extrainous vars/obs
@@ -198,7 +213,7 @@
 			fundingagency primepartner mechanismid implementingmechanismname ///
 			indicator fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
 			fy2016q1 fy2016q2 fy2016q2 fy2016q3 fy2016q4 fy2016apr fy2017_targets ///
-			fy2017q1 fy2017q2 fy2017q3 fy2017q4 fy2017apr fy2017cum
+			fy2017q1 fy2017q2 fy2017q3 fy2017q4 fy2017apr fy2017cum avg_gr
 		keep `vars'
 		order `vars'
 		
@@ -212,6 +227,8 @@
 		restore
 		merge m:1 mechanismid using "$output/officialnames.dta", ///
 			update replace nogen keep(1 3 4 5) //keep all but non match from using
-
+	
 	*export
 		export delimited using "$excel/progressq3", nolabel replace dataf
+	*remove intermediate dataset
+		erase "$output/extradata.dta"
