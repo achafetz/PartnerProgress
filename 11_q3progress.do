@@ -2,12 +2,13 @@
 **   FY1&
 **   Aaron Chafetz
 **   Purpose: project out APR results 
-**   Updated: July 26, 2017
+**   Updated: July 27, 2017
 
 /* NOTES
 	- builds off structure of PPR base dataset
 	- Data source: ICPI_Fact_View_OU_IM
 	- run 00_initialize prior to using this do file
+	- requires 06_partnerreport_officalnames to be saved in project folder
 */
 
 ********************************************************************************
@@ -25,12 +26,12 @@
 
 	
 ** WRANGLING **
-
+	
 	*keep only relevant indicators for analysis
 		keep if ///
 			inlist(indicator, "HTS_TST", "HTS_TST_POS", "TX_NEW", "TX_CURR", ///
 			"TX_NET_NEW", "PMTCT_STAT") & disaggregate=="Total Numerator"
-		
+	
 	*add future quarters in 
 		foreach x in q2 q3 q4 apr{
 			capture confirm variable fy2017`x'
@@ -53,6 +54,14 @@
 			drop if kp==0
 			drop kp
 			
+	*update all partner and mech to offical names (based on FACTS Info)
+		*tostring mechanismid, replace
+		preserve
+		run 06_partnerreport_officalnames
+		restore
+		merge m:1 mechanismid using "$output/officialnames.dta", ///
+			update replace nogen keep(1 3 4 5) //keep all but non match from using
+		
 	*aggregate so there is only one obvervation per mechanism
 		collapse (sum) fy*, by(operatingunit primepartner fundingagency ///
 			mechanismid implementingmechanismname indicator)
@@ -98,34 +107,23 @@
 		* moving average from prior 6 quarters
 		* FY16Q1 - 224, FY17Q3 - 230, FY17Q4 - 231
 		* FY17Q3 moving average
-		bysort pnl: egen ma_gr_q3 = mean(gr) if inrange(qdate,224,230) //moving average mech/ind over past 6 quarters
-			replace ma_gr_q3 = . if qdate!=230 //remove ma from other quaters
-		bysort ind: egen ma_gr_q3_overall = mean(gr) if inrange(qdate,224,230) //average ind growth over past 6 quarters if mech doesn't have data
-			replace ma_gr_q3_overall = . if qdate!=230
-		* FY17Q4 moving average
-		bysort pnl: egen ma_gr_q4 = mean(gr) if inrange(qdate,225,231) //moving average mech/ind over past 6 quarters
-			replace ma_gr_q4 = . if qdate!=231
-		bysort ind: egen ma_gr_q4_overall = mean(gr) if inrange(qdate,225,231) //average ind growth over past 6 quarters if mech doesn't have data
-			replace ma_gr_q4_overall = . if qdate!=231
+		bysort pnl: egen avg_gr = mean(gr) if inrange(qdate,224,231) //moving average mech/ind over past 6 quarters
+			replace avg_gr = . if !inlist(qdate, 230, 231) //remove ma from other quaters
+		bysort ind: egen avg_gr_overall = mean(gr) if inrange(qdate,224,231) //average ind growth over past 6 quarters if mech doesn't have data
+			replace avg_gr_overall = . if !inlist(qdate, 230, 231)
+			replace avg_gr = avg_gr_overall if avg_gr== . & inlist(qdate, 230, 231)
 			
-	*create actual moving average variable, pulling from variables just created 
-		gen ma = ma_gr_q3 if qdate==230 // add FY17Q3 moving average
-			replace ma = ma_gr_q3_overall if ma_gr_q3==. & qdate==230 // replace with ind average if mech missing data
-			replace ma = ma_gr_q4 if qdate==231 // add FY17Q4 moving average
-			replace ma = ma_gr_q4_overall if ma_gr_q4==. & qdate==231 // replace with ind average if mech missing data
-
 	*sort variables and add projected FYQ3 and Q4 data using moving average
 		sort pnl qdate indicator
-		replace fy = round((1+ ma) * L.fy, 1) if inlist(qdate, 230, 231)
+		replace fy = round((1+ avg_gr)*L.fy, 1) if inlist(qdate, 230, 231)
 
 	*drop variables created in process
-		drop qdate ind gr ma_gr_q3_overall-ma
-		rename ma_gr_q3 ma_fy
-		replace ma_fy = round(ma_fy, .001)
+		drop qdate ind gr avg_gr_overall
+		replace avg_gr = round(avg_gr, .001)
 	*reshape back to original fact view setup
-		reshape wide fy ma_fy, i(pnl) j(qtr, string)
-		rename ma_fy2017q3 avg_gr
-		ds ma_*
+		reshape wide fy avg_gr, i(pnl) j(qtr, string)
+		rename avg_gr2017q3 avg_gr
+		ds avg_gr2*
 		drop `r(varlist)' pnl
 		order operatingunit-indicator
 
@@ -140,6 +138,7 @@
 		egen fy2017apr_p = rowtotal(fy2017q1 fy2017q2 fy2017q3 fy2017q4)
 			replace fy2017apr_p = fy2017q4 if inlist(indicator, "TX_CURR", "OVC_SERV")
 			replace fy2017apr = fy2017apr_p
+			drop fy2017apr_p
 			recode fy2017apr (0 = .)	
 		
 		
@@ -187,48 +186,90 @@
 			replace `pd' = . if indicator=="TX_NET_NEW"
 			}
 			*end
-
+	*save before Linkage adjustment
+		save "$output/nearfinaldata.dta", replace
+		
 ** Linkage **
 		
 	*linkage = TX_NEW/HTS_TST_POS
 		keep if inlist(indicator, "HTS_TST_POS", "TX_NEW")
+		drop avg_gr
+	*reshape long to allow dataset to become a timeseries & transform time variable to date format
+		egen id = group(operatingunit primepartner fundingagency mechanismid ///
+			implementingmechanismname indicator)
+		reshape long fy, i(id) j(qtr, string)
+		drop id
+		
+	*recode 0s to missing
+		recode fy (0 = .)
 		
 	*reshape for calculation
 		reshape wide fy, i(qtr operatingunit primepartner fundingagency mechanismid implementingmechanismname) j(indicator, string)
 	
 	*calc linkage
-		gen fyLINKAGE = round(fyTX_NEW/fyHTS_TST_POS,.001)
+		gen fyLINKAGE = round(fyTX_NEW/fyHTS_TST_POS, .001)
 	
 	*reshape back to long & only keep linkage data
 		reshape long
 		keep if indicator=="LINKAGE" & fy!=.
 		
 	*reshape wide to append to original dataset	
+		reshape wide fy, i(operatingunit primepartner fundingagency mechanismid implementingmechanismname indicator) j(qtr, string)
 	
-	
+	*save
+		replace indicator = "LINKAGE (HTS to TX)"
+		save "$output/lnkgdata.dta", replace
+		
 ** FINAL CLEANUP & EXPORT			
-
+	* reopen 
+		use "$output/nearfinaldata.dta", clear
+		append using "$output/lnkgdata.dta"
+		
 	*delete extrainous vars/obs
 		local vars operatingunit ///
 			fundingagency primepartner mechanismid implementingmechanismname ///
-			indicator fy2015q2 fy2015q3 fy2015q4 fy2015apr fy2016_targets ///
-			fy2016q1 fy2016q2 fy2016q2 fy2016q3 fy2016q4 fy2016apr fy2017_targets ///
-			fy2017q1 fy2017q2 fy2017q3 fy2017q4 fy2017apr fy2017cum avg_gr
+			indicator fy2016_targets fy2016q1 fy2016q2 fy2016q2 fy2016q3 ///
+			fy2016q4 fy2016apr fy2017_targets fy2017q1 fy2017q2 fy2017q3 ///
+			fy2017q4 fy2017apr fy2017cum avg_gr
 		keep `vars'
 		order `vars'
 		
 	*only keep USAID partners 
 		keep if fundingagency=="USAID"	
 		
-	*update all partner and mech to offical names (based on FACTS Info)
-		*tostring mechanismid, replace
+	*order indicators
 		preserve
-		run 06_partnerreport_officalnames
+		clear
+		input int ind2 str36 indicator
+			1 "HTS_TST"
+			2 "HTS_TST_POS"
+			3 "TX_NEW"
+			4 "LINKAGE (HTS to TX)"
+			5 "TX_CURR"
+			6 "TX_NET_NEW"
+			7 "PMTCT_STAT"
+		end
+		tempfile temp_ind
+		save "`temp_ind'"
 		restore
-		merge m:1 mechanismid using "$output/officialnames.dta", ///
-			update replace nogen keep(1 3 4 5) //keep all but non match from using
-	
+	*merge order back in
+		merge m:1 indicator using "`temp_ind'", nogen noreport
+		
+	/*label new indicator variable and replace old string
+		labmask ind2, values(indicator)
+		drop indicator
+		rename ind2 indicator
+		order indicator, after(implementingmechanismname) */
+		
+	*sort by mech
+		sort operatingunit mechanismid ind2
+		drop ind2
+		
 	*export
 		export delimited using "$excel/progressq3", nolabel replace dataf
+		
 	*remove intermediate dataset
-		erase "$output/extradata.dta"
+		foreach x in extradata nearfinaldata lnkgdata {
+			rm "$output/`x'.dta"
+			}
+			*end
