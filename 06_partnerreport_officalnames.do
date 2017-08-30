@@ -3,7 +3,7 @@
 **   Aaron Chafetz
 **   Purpose: correct naming partner and mechanism names to offical source
 **   Date: November 22, 2016
-**   Updated: 5/30/17
+**   Updated: 8/23/17
 
 /* NOTES
 	- Data source: FACTS Info, May 25, 2017
@@ -11,7 +11,7 @@
 */
 ********************************************************************************
 
-global datetime "20170525"
+global datetime "20170822"
 
 *import data
 	import excel using "$data/FY12-16 Standard COP Matrix Report-${datetime}.xls", ///
