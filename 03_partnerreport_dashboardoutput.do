@@ -3,7 +3,7 @@
 **   Aaron Chafetz
 **   Purpose: generate output for Excel monitoring dashboard
 **   Date: June 20, 2016
-**   Updated: 8/29/17
+**   Updated: 11/21/17
 
 /* NOTES
 	- Data source: ICPI_Fact_View_PSNU_IM  [ICPI Data Store]
@@ -13,18 +13,18 @@
 ********************************************************************************
 
 *Which outputs to produce? 0 = No, 1 = Yes
-	global global_output 0 //full global dataset
+	global global_output 1 //full global dataset
 	global equip_output 0 //full global dataset
 	global ctry_output 1 	//one dataset for every OU
 	global sel_output 0	//just an outut for select OU specified below
-	global sel_output_list "Zambia"  //OU selection
+	global sel_output_list "Malawi"  //OU selection
 
 
 *set today's date for saving
 	global date = subinstr("`c(current_date)'", " ", "", .)
 
 *set date of frozen instance - needs to be changed w/ updated data
-	global datestamp "20170815_v1_1"
+	global datestamp "20171115_v1_1"
 
 *import/open data
 	capture confirm file "$fvdata/ICPI_FactView_PSNU_IM_${datestamp}.dta"
@@ -50,8 +50,9 @@
 			"PMTCT_STAT", "PMTCT_STAT_POS", "PMTCT_ART", "PMTCT_EID", "TX_NEW", "TX_CURR", ///
 			"VMMC_CIRC") | ///
 		inlist(indicator, "KP_PREV", "PP_PREV", "OVC_HIVSTAT", "OVC_SERV", ///
-				"TB_ART", "TB_STAT", "TB_STAT_POS", "TX_TB")) & disaggregate=="Total Numerator"
-		/* inlist(indicator, "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT") ///  */
+				"TB_ART", "TB_STAT", "TB_STAT_POS", "TX_TB") | ///
+		inlist(indicator, "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT")) & ///
+		disaggregate=="Total Numerator"
 
 	*denominators (semi-annually)
 		foreach x in "TB_STAT" "TB_ART"{
@@ -63,7 +64,8 @@
 	*MCAD indicators disaggs
 	replace key_ind=indicator if inlist(standardizeddisaggregate, "MostCompleteAgeDisagg", ///
 		"Modality/MostCompleteAgeDisagg") & indicator!="HTS_TST_NEG" & ///
-		sex!="" & inlist(age, "<15", "15+")
+		inlist(sex, "Female", "Male", "Unknown Sex") & inlist(age, "<15", "15+")
+		replace key_ind = "" if otherdisaggregate=="Unknown Sex" 
 
 *keep only key indicators
 	drop if key_ind=="" //only need data on key indicators
@@ -73,7 +75,7 @@
 			replace key_ind= "TX_NET_NEW" if new==1 //rename duplicate TX_NET_NEW
 			drop new
 		*create copy periods to replace "." w/ 0 for generating net new (if . using in calc --> answer == .)
-		foreach x in fy2015q2 fy2015q4 fy2016q2 fy2016q4 fy2017q1 fy2017q2 fy2017q3 fy2017_targets{
+		foreach x in fy2015q2 fy2015q4 fy2016q2 fy2016q4 fy2017q1 fy2017q2 fy2017q3 fy2017q4 fy2017_targets{
 			clonevar `x'_cc = `x'
 			recode `x'_cc (. = 0)
 			}
@@ -86,12 +88,12 @@
 		gen fy2017q1_nn = fy2017q1_cc-fy2016q4_cc
 		gen fy2017q2_nn = fy2017q2_cc-fy2017q1_cc
 		gen fy2017q3_nn = fy2017q3_cc-fy2017q2_cc
-		**gen fy2017q4_nn = fy2017q4_cc-fy2017q3_cc //for Q4
+		gen fy2017q4_nn = fy2017q4_cc-fy2017q3_cc //for Q4
 		gen fy2017_targets_nn = fy2017_targets_cc - fy2016q4_cc
-		*egen fy2017apr_nn = rowtotal(fy2017q2_nn fy2017q4_nn) //for Q4
+		egen fy2017apr_nn = rowtotal(fy2017q1_nn fy2017q2_nn fy2017q3_nn fy2017q4_nn) //for Q4
 		drop *_cc
 		*replace raw period values with generated net_new values
-		foreach x in fy2015q4 fy2016q2 fy2016q4 fy2016apr fy2017q1 fy2017q2 fy2017q3 fy2017_targets{
+		foreach x in fy2015q4 fy2016q2 fy2016q4 fy2016apr fy2017q1 fy2017q2 fy2017q3 fy2017q4 fy2017apr fy2017_targets{
 			replace `x' = `x'_nn if key_ind=="TX_NET_NEW"
 			drop `x'_nn
 			}
@@ -123,13 +125,14 @@
 		replace fy2017cum = fy2017q`i' if key_ind=="TX_CURR"
 		*clean up
 		replace fy2017cum =. if fy2017cum==0 //should be missing
-		/*capture confirm variable fy2017apr
-			if !_rc replace fy2017cum = fy2017apr */
+		*take apr val as cum in Q4
+		capture confirm variable fy2017apr
+			if !_rc replace fy2017cum = fy2017apr
 
 * format disaggs
 	gen disagg = "Total"
-		replace disagg = age + "/" + sex if ismcad=="Y"
-
+		replace disagg = age + "/" + sex if ismcad=="Y" & age!="Unknown Age"
+		
 * delete extrainous vars/obs
 	drop indicator
 	rename ïregion region
@@ -174,7 +177,7 @@
 		*end
 
 *export EQUIP global dataset
-	if $global_output == 1 {
+	if $equip_output == 1 {
 		di "EQUIP OUTPUT"
 		preserve
 		merge m:1 mechanismid using "$data/equip_mech_list.dta", nogen keep(matched)
