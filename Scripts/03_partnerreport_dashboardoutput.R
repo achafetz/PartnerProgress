@@ -63,13 +63,17 @@ datafv <- "~/ICPI/Data"
 	  source(here("Scripts", "currentperiod.R"))
 	  curr_q <- currrentpd(df_ppr, "quarter")
 	  
-	#filter
+	#filter to select indicators (based on quarter)
 	df_ppr <- fvdata %>% 
 	  filter(((indicator %in% get(paste0("ind_q", curr_q)) ) & disaggregate=="Total Numerator") |
 	         ((standardizeddisaggregate %in% c("MostCompleteAgeDisagg", "Modality/MostCompleteAgeDisagg")) & 
 	           indicator!="HTS_TST_NEG") & sex!="" & (age %in% c("<15", "15+")))
   	rm(list = ls(pattern = "^ind")) 
 	
+  #create net new and bind it on
+  	source(here("Scripts", "netnew.R"))
+  	df_ppr <- netnew(df_ppr)
+  	
 	#############################################
   source(here("Scripts", "officialnames.R"))
   df_psnu_im <- officialnames(df_psnu_im, here("RawData")) 

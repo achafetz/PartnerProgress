@@ -1,6 +1,6 @@
 #' Generate NET_NEW variable
 #'
-#' @param df dataset to use/add net new to
+#' @param df dataset to use/bind net new to
 #' 
 #' @importFrom dplyr %>%
 #' @examples
