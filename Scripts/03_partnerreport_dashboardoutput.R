@@ -32,37 +32,9 @@ datafv <- "~/ICPI/Data"
 #import/open data	
 	fvdata <- read_rds(Sys.glob(file.path(datafv, "ICPI_FactView_PSNU_IM_*.Rds")))
 
-#identify current fy
-	curr_fy <- headers[str_detect(headers, "q(?=[:digit:])")] %>% 
-	  tail(., n =1) %>% 
-	  str_sub(1, -3)
-	
-#identify current period
-	headers <- names(fvdata)
-	curr_q <- headers[str_detect(headers, "q(?=[:digit:])")] %>% 
-	  tail(., n =1) %>% 
-	  str_sub(-1) %>% 
-	  as.integer(.)
-
-	rm(headers)
-
-#add new columns if not yet at q4
-	if(curr_q != 4) {
-	  #n+1 quater 
-	  new_qs <- curr_q + 1 
-	  #create new columns for n+1 quater to Q4
-	  for(i in new_qs:4){
-	    #define variable name, eg fy2018q2
-	    varname <- paste0(curr_fy, "q", i)
-	    #create variable
-	    df_netnew <- df_netnew %>% 
-	      mutate(!!varname := 0)
-	  }
-	  #create apr column
-	  varname <- paste0(curr_fy, "apr")
-	  df_netnew <- df_netnew %>% 
-	    mutate(!!varname := 0)
-	}
+#create future filler columns
+	source(here("Scripts", "futurefiller.R"))
+	fvdata <- fill_future_pds(fvdata)
 	
 #SNU prioritizations
 	df_ppr <- fvdata %>% 
@@ -74,7 +46,8 @@ datafv <- "~/ICPI/Data"
 	  mutate(indicator = ifelse((indicator=="TB_ART" & disaggregate=="Total Denominator"),"TB_ART_D",indicator),
 	       indicator = ifelse((indicator=="TB_STAT" & disaggregate=="Total Denominator"),"TB_STAT_D",indicator),
 	       disaggregate = ifelse((indicator %in% c("TB_ART_D", "TB_STAT_D")),"Total Numerator",disaggregate))
-	#indicators to keep
+	
+	#indicators to keep (based on the quarter)
 	#q1 
 	  ind_q1 <- c("HTS_TST", "TX_NEW", "PMTCT_EID", "HTS_TST_POS", "PMTCT_STAT", 
 	         "PMTCT_STAT_POS", "TX_NET_NEW", "TX_CURR", "PMTCT_ART", "VMMC_CIRC")
@@ -83,9 +56,12 @@ datafv <- "~/ICPI/Data"
 	            "TB_ART", "TB_STAT", "TB_STAT_POS", "TB_ART_D", "TB_STAT_D", "TX_TB")
 	#q3
 	  ind_q3 <- c(ind_q2)
-	
 	#q4 
 	  ind_q4 <- c(ind_q3, "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT")
+	  
+	#determine which quarter it is
+	  source(here("Scripts", "currentperiod.R"))
+	  curr_q <- currrentpd(df_ppr, "quarter")
 	  
 	#filter
 	df_ppr <- fvdata %>% 
@@ -96,7 +72,7 @@ datafv <- "~/ICPI/Data"
 	
 	#############################################
   source(here("Scripts", "officialnames.R"))
-	 
+  df_psnu_im <- officialnames(df_psnu_im, here("RawData")) 
 	 ###########################################
 	 
    #create age/sex disagg
