@@ -21,7 +21,7 @@ fill_future_pds <- function(df){
     #create new columns for n+1 quater to Q4
     for(i in new_qs:4){
       #define variable name, eg fy2018q2
-      varname <- paste0(curr_fy, "q", i)
+      varname <- paste0("fy", curr_fy, "q", i)
       #create variable
       df <- df %>% 
         dplyr::mutate(!!varname := 0)
