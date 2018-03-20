@@ -31,13 +31,38 @@ datafv <- "~/ICPI/Data"
 
 #import/open data	
 	fvdata <- read_rds(Sys.glob(file.path(datafv, "ICPI_FactView_PSNU_IM_*.Rds")))
+
+#identify current fy
+	curr_fy <- headers[str_detect(headers, "q(?=[:digit:])")] %>% 
+	  tail(., n =1) %>% 
+	  str_sub(1, -3)
 	
 #identify current period
 	headers <- names(fvdata)
 	curr_q <- headers[str_detect(headers, "q(?=[:digit:])")] %>% 
 	  tail(., n =1) %>% 
-	  str_sub(-1)
+	  str_sub(-1) %>% 
+	  as.integer(.)
+
 	rm(headers)
+
+#add new columns if not yet at q4
+	if(curr_q != 4) {
+	  #n+1 quater 
+	  new_qs <- curr_q + 1 
+	  #create new columns for n+1 quater to Q4
+	  for(i in new_qs:4){
+	    #define variable name, eg fy2018q2
+	    varname <- paste0(curr_fy, "q", i)
+	    #create variable
+	    df_netnew <- df_netnew %>% 
+	      mutate(!!varname := 0)
+	  }
+	  #create apr column
+	  varname <- paste0(curr_fy, "apr")
+	  df_netnew <- df_netnew %>% 
+	    mutate(!!varname := 0)
+	}
 	
 #SNU prioritizations
 	df_ppr <- fvdata %>% 
@@ -78,7 +103,7 @@ datafv <- "~/ICPI/Data"
 	  mutate(disagg = ifelse(ismcad=="Y", paste(age, sex, sep="/"), "Total")) %>%
 	  
   #aggregate by subset variable list
-  group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
+    group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
                   fundingagency, primepartner, mechanismid, implementingmechanismname,
                   indicator, disagg) %>%
    summarize_at(vars(starts_with("fy")), funs(sum(., na.rm=TRUE))) %>%
@@ -86,41 +111,7 @@ datafv <- "~/ICPI/Data"
 
 #####
  
-#TX_NET_NEW indicator
-	#subset to just TX_CURR which will become NET NEW
-	df_netnew <- df_ppr %>%
-	  mutate_at(vars(starts_with("fy2")), ifelse(is.na(.),0,.)) %>% 
-	  filter(indicator=="TX_CURR") %>%
-	  mutate(indicator = "TX_NET_NEW") 
-	
-	#create net new variable
-	df_netnew <- df_netnew %>%
-	  mutate(fy2015q4_cc =  fy2015q4 - fy2015q2,
-	         fy2016q2_cc =  fy2016q2 - fy2015q4,
-	         fy2016q4_cc =  fy2016q4 - fy2016q2,
-	         fy2017q1_cc =  fy2017q1 - fy2016q4,
-	         fy2017q2_cc =  fy2017q2 - fy2017q1,
-	         fy2017q3_cc =  fy2017q3 - fy2017q2,
-	         fy2017_targets_cc = fy2017_targets - fy2016q4) %>%
-	  mutate(fy2015q2 = 0, 
-	         fy2015q3 = 0,
-	         fy2015q4 =  fy2015q4_cc,
-	         fy2015apr = 0,
-	         fy2016_targets = 0,
-	         fy2016q1 =  0,
-	         fy2016q2 =  fy2016q2_cc,
-	         fy2016q3 =  0,
-	         fy2016q4 =  fy2016q4_cc,
-	         fy2016apr = fy2016q2_cc + fy2016q4_cc, 
-	         fy2017q1 =  fy2017q1_cc,
-	         fy2017q2 =  fy2017q2_cc,
-	         fy2017q3 =  fy2017q3_cc,
-	         fy2017_targets = fy2017_targets_cc) %>%
-	  select(-ends_with("_cc")) %>%  
-	  
-	  #append TX_NET_NEW onto main dataframe
-	  bind_rows(df_netnew)
-	  rm(df_netnew)
+#NET NEW
 	
 #####   
 
