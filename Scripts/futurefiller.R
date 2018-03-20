@@ -9,9 +9,10 @@
 #' 
 fill_future_pds <- function(df){
   
-  #find current quarter
-  source(here("Scripts", "currentpd.R"))
-  curr_q <- currentperiod(df, "quarter")
+  #find current quarter & fy
+  source(here("Scripts", "currentperiod.R"))
+  curr_q <- currentpd(df, "quarter")
+  curr_fy <- currentpd(df, "year")
   
   #add new columns if not yet at q4  
   if(curr_q != 4) {
