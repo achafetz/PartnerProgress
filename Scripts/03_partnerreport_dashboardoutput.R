@@ -27,10 +27,10 @@ datafv <- "~/ICPI/Data"
   #sel_output_list <- "Zambia"  //OU selection
 
 #set today's date for saving
-	date = format(Sys.Date(), format="%Y%b%d")
+	date <- format(Sys.Date(), format="%Y%b%d")
 
 #import/open data	
-	fvdata <- read_rds(Sys.glob(file.path(datafv, "ICPI_FactView_PSNU_IM_*.Rds")))
+	df_mer <- read_rds(Sys.glob(file.path(datafv, "ICPI_FactView_PSNU_IM_*.Rds")))
 
 #find current quarter & fy
 	source(here("Scripts", "currentperiod.R"))
@@ -39,41 +39,15 @@ datafv <- "~/ICPI/Data"
 	
 #create future filler columns
 	source(here("Scripts", "futurefiller.R"))
-	fvdata <- fill_future_pds(fvdata, curr_fy, curr_q)
+	df_mer <- fill_future_pds(df_mer, curr_fy, curr_q)
 	
-#SNU prioritizations
-	df_ppr <- fvdata %>% 
-    mutate(currentsnuprioritization = ifelse(is.na(currentsnuprioritization),"[not classified]", currentsnuprioritization))
+#subset to indicators of interest
+	source(here("Scripts", "filter_inds.R"))
+	df_ppr <- filter_keyinds(df_mer, curr_q)
 	
-#create new indicator variable for only the ones of interest for analysis
-	#rename denominator values _D
-	df_ppr <- fvdata %>% 
-	  mutate(indicator = ifelse((indicator=="TB_ART" & disaggregate=="Total Denominator"),"TB_ART_D",indicator),
-	       indicator = ifelse((indicator=="TB_STAT" & disaggregate=="Total Denominator"),"TB_STAT_D",indicator),
-	       disaggregate = ifelse((indicator %in% c("TB_ART_D", "TB_STAT_D")),"Total Numerator",disaggregate))
-	
-	#indicators to keep (based on the quarter)
-	#q1 
-	  ind_q1 <- c("HTS_TST", "TX_NEW", "PMTCT_EID", "HTS_TST_POS", "PMTCT_STAT", 
-	         "PMTCT_STAT_POS", "TX_NET_NEW", "TX_CURR", "PMTCT_ART", "VMMC_CIRC")
-	#q2
-	  ind_q2 <- c(ind_q1, "KP_PREV", "PP_PREV", "OVC_HIVSTAT", "OVC_SERV",
-	            "TB_ART", "TB_STAT", "TB_STAT_POS", "TB_ART_D", "TB_STAT_D", "TX_TB")
-	#q3
-	  ind_q3 <- c(ind_q2)
-	#q4 
-	  ind_q4 <- c(ind_q3, "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT")
-	  
-	#filter to select indicators (based on quarter)
-	df_ppr <- fvdata %>% 
-	  filter(((indicator %in% get(paste0("ind_q", curr_q)) ) & disaggregate=="Total Numerator") |
-	         ((standardizeddisaggregate %in% c("MostCompleteAgeDisagg", "Modality/MostCompleteAgeDisagg")) & 
-	           indicator!="HTS_TST_NEG") & sex!="" & (age %in% c("<15", "15+")))
-  	rm(list = ls(pattern = "^ind")) 
-	
-  #create net new and bind it on
-  	source(here("Scripts", "netnew.R"))
-  	df_ppr <- netnew(df_ppr)
+#create net new and bind it on
+	source(here("Scripts", "netnew.R"))
+	df_ppr <- netnew(df_ppr)
   	
   #add cumulative value for fy
     source(here("Scripts", "cumulative.R"))
@@ -88,12 +62,15 @@ datafv <- "~/ICPI/Data"
 	 df_ppr <- officialnames(df_ppr, here("RawData"))  
 	 
   #aggregate by subset variable list
-    group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
+   group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
                   fundingagency, primepartner, mechanismid, implementingmechanismname,
                   indicator, disagg) %>%
    summarize_at(vars(starts_with("fy")), funs(sum(., na.rm=TRUE))) %>%
    ungroup()
 
+  #SNU prioritizations
+   df_ppr <- df_ppr %>% 
+     mutate(currentsnuprioritization = ifelse(is.na(currentsnuprioritization),"[not classified]", currentsnuprioritization))
 	
 	#replace all 0's with NA
 	  df_ppr[df_ppr==0] <- NA
