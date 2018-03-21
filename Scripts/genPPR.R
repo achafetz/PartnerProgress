@@ -47,10 +47,6 @@ datapathfv <- "~/ICPI/Data"
 #create net new and bind it on
 	source(here("Scripts", "netnew.R"))
 	df_ppr <- netnew(df_ppr)
-  	
-#add cumulative value for fy
-  source(here("Scripts", "cumulative.R"))
-  df_ppr <- cumulative(df_ppr, curr_fy, curr_q)
 
 #apply offical names before aggregating (since same mech id may have multiple partner/mech names)  
   source(here("Scripts", "officialnames.R"))
@@ -62,26 +58,33 @@ datapathfv <- "~/ICPI/Data"
            currentsnuprioritization = ifelse(is.na(currentsnuprioritization),"[not classified]", currentsnuprioritization))
   
 #aggregate by subset variable list
-   group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
-            fundingagency, primepartner, mechanismid, implementingmechanismname,
-            indicator, disagg) %>%
-   summarize_at(vars(starts_with("fy")), funs(sum(., na.rm=TRUE))) %>%
-   ungroup()
+  df_ppr <- df_ppr %>%  
+    group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
+              fundingagency, primepartner, mechanismid, implementingmechanismname,
+              indicator, disagg) %>%
+     summarize_at(vars(starts_with("fy")), ~ sum(., na.rm=TRUE)) %>%
+     ungroup()
 
-#replace all 0's with NA
-	  df_ppr[df_ppr==0] <- NA
-	  
-#dropp missing rows
+#drop missing rows
 	df_ppr <- df_ppr %>%
 	    gather(period, value, starts_with("fy"), na.rm = TRUE, factor_key = TRUE) %>%
+	    mutate(value = ifelse(value == 0, NA, value)) %>% 
 	    drop_na(value) %>%
-	    spread(period, value) %>%
+	    spread(period, value)
+	
+#add future pds back in
+	source(here("Scripts", "futurefiller.R"))
+	df_ppr <- fill_future_pds(df_ppr, curr_fy, curr_q)
+
+#add cumulative value for fy
+	source(here("Scripts", "cumulative.R"))
+	df_ppr <- cumulative(df_ppr, curr_fy, curr_q)
+	
+#replace all 0's with NA
+	df_ppr[df_ppr==0] <- NA
+
 	
 	
-	test<- df_ppr %>% drop_na(fy2015q2:fy2017cum)
-	
-	
-	
-	#set today's date for saving
+#set today's date for saving
 	date <- format(Sys.Date(), format="%Y%b%d")
 	
