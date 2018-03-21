@@ -75,17 +75,18 @@ datafv <- "~/ICPI/Data"
   	source(here("Scripts", "netnew.R"))
   	df_ppr <- netnew(df_ppr)
   	
-	#############################################
-  source(here("Scripts", "officialnames.R"))
-  df_ppr <- officialnames(df_ppr, here("RawData")) 
-  
-  source(here("Scripts", "fy_cumulative.R"))
-  df_ppr <- fy_cumulative(df_ppr, curr_fy, curr_q)
-  
+  #add cumulative value for fy
+    source(here("Scripts", "cumulative.R"))
+    df_ppr <- cumulative(df_ppr, curr_fy, curr_q)
 	 
    #create age/sex disagg
-	  mutate(disagg = ifelse(ismcad=="Y", paste(age, sex, sep="/"), "Total")) %>%
-	  
+	 df_ppr <- df_ppr %>% 
+	   mutate(disagg = ifelse(ismcad=="Y", paste(age, sex, sep="/"), "Total")) %>%
+	
+	#apply offical names before aggregating (since same mech id may have multiple partner/mech names)  
+	 source(here("Scripts", "officialnames.R"))
+	 df_ppr <- officialnames(df_ppr, here("RawData"))  
+	 
   #aggregate by subset variable list
     group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
                   fundingagency, primepartner, mechanismid, implementingmechanismname,
@@ -93,30 +94,15 @@ datafv <- "~/ICPI/Data"
    summarize_at(vars(starts_with("fy")), funs(sum(., na.rm=TRUE))) %>%
    ungroup()
 
-#####
- 
-#NET NEW
 	
-#####   
-
-	#create cumulative indicator
-	df_ppr[is.na(df_ppr)] <- 0
-	df_ppr <- df_ppr %>% 
-	  mutate(fy2017cum = ifelse(indicator=="TX_CURR", fy2017q3, 
-	                            ifelse(indicator %in% c("KP_PREV","PP_PREV", "OVC_HIVSTAT", "OVC_SERV", 
-	                                                    "TB_ART", "TB_STAT", "TX_TB", "GEND_GBV", "PMTCT_FO", 
-	                                                    "TX_RET", "KP_MAT"), 
-	                                   fy2017q2, fy2017q1 + fy2017q2 + fy2017q3 + fy2017q4)))
-	
-	
-	df_ppr[df_ppr==0] <- NA
+	#replace all 0's with NA
+	  df_ppr[df_ppr==0] <- NA
 	
 	df_ppr <- df_ppr %>%
-	    gather(period, value, contains("fy")) %>%
+	    gather(period, value, starts_with("fy"), na.rm = TRUE, factor_key = TRUE) %>%
 	    drop_na(value) %>%
 	    spread(period, value) %>%
-	  #add future periods if they don't yet exist
-	  mutate(fy2017q4 = NA) %>%
+
 	    select(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
 	           fundingagency, primepartner, mechanismid, implementingmechanismname,
 	           indicator, disagg, fy2015q2, fy2015q3, fy2015q4, fy2015apr, fy2016_targets,
