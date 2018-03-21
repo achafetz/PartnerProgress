@@ -38,9 +38,22 @@ cumulative <- function(df, fy, q){
         dplyr::ungroup() %>% 
         #convert back to logical for merging
         dplyr::mutate(coarsedisaggregate = as.logical(coarsedisaggregate))
-        
+     
+  
      #merge cumulative back onto main df 
       df <- full_join(df, df_cum)
+      
+      #adjust semi annual indicators
+      semi_ann <- c("KP_PREV", "PP_PREV", "OVC_HIVSTAT", "OVC_SERV", "TB_ART",
+                    "TB_STAT", "TX_TB", "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT")
+      if(q %in% c(2, 3)) {
+        df <- dplyr::mutate(df, !!varname := ifelse(indicator %in% semi_ann, get(paste0("fy", fy, "q2")), !!varname))
+      }
+      
+      #adjust snapshot indicators to equal current quarter
+      snapshot <- c("TX_CURR")
+      df <- dplyr::mutate(df, !!varname := ifelse(indicator %in% snapshot, get(paste0("fy", fy, "q", q)), !!varname))
+      
     }
     
 }
