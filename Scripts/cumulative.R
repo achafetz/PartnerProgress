@@ -10,23 +10,23 @@
 #' df_mer <- cumulative(cumulative, 2018, 1)
 
 
-cumulative <- function(df, fy, q){
+cumulative <- function(df, fy, qtr){
   
   #contatenate variable name, eg fy2018cum
     varname <- paste0("fy", fy, "cum")
   #add q to end of fyfr select function
-    fy <- paste0("fy", fy, "q")
+    fy_str <- paste0("fy", fy, "q")
   #generate cumulative value 
     #if its Q4, just use APR value
-    if(q == 4){
+    if(qtr == 4){
       df <- df %>% 
         mutate(!!varname := get(paste0("fy", fy, "apr")))
     } else {
       df_cum <- df %>% 
         #keep "meta" data and any quarterly values from current fy
-        dplyr::select(region:ismcad, dplyr::starts_with(curr_fy)) %>% 
+        dplyr::select(region:ismcad, dplyr::starts_with(fy_str)) %>% 
         #reshape long (and then going to aggregate)
-        tidyr::gather(pd, !!varname, dplyr::starts_with(curr_fy), na.rm  = TRUE) %>% 
+        tidyr::gather(pd, !!varname, dplyr::starts_with(fy_str), na.rm  = TRUE) %>% 
         #convert to character  for grouping
         dplyr::mutate(coarsedisaggregate = as.character(coarsedisaggregate)) %>% 
         #aggregating over all quaters, so remove
@@ -46,13 +46,13 @@ cumulative <- function(df, fy, q){
       #adjust semi annual indicators
       semi_ann <- c("KP_PREV", "PP_PREV", "OVC_HIVSTAT", "OVC_SERV", "TB_ART",
                     "TB_STAT", "TX_TB", "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT")
-      if(q %in% c(2, 3)) {
-        df <- dplyr::mutate(df, !!varname := ifelse(indicator %in% semi_ann, get(paste0("fy", fy, "q2")), !!varname))
+      if(qtr %in% c(2, 3)) {
+        df <- dplyr::mutate(df, !!varname := ifelse(indicator %in% semi_ann, get(paste0(fy_str, "2")), !!varname))
       }
       
       #adjust snapshot indicators to equal current quarter
       snapshot <- c("TX_CURR")
-      df <- dplyr::mutate(df, !!varname := ifelse(indicator %in% snapshot, get(paste0("fy", fy, "q", q)), !!varname))
+      df <- dplyr::mutate(df, !!varname := ifelse(indicator %in% snapshot, get(paste0(fy_str, qtr)), !!varname))
       
     }
     
