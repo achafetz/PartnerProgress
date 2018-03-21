@@ -49,22 +49,22 @@ datafv <- "~/ICPI/Data"
 	source(here("Scripts", "netnew.R"))
 	df_ppr <- netnew(df_ppr)
   	
-  #add cumulative value for fy
-    source(here("Scripts", "cumulative.R"))
-    df_ppr <- cumulative(df_ppr, curr_fy, curr_q)
-	 
-   #create age/sex disagg
-	 df_ppr <- df_ppr %>% 
-	   mutate(disagg = ifelse(ismcad=="Y", paste(age, sex, sep="/"), "Total")) %>%
+#add cumulative value for fy
+  source(here("Scripts", "cumulative.R"))
+  df_ppr <- cumulative(df_ppr, curr_fy, curr_q)
+ 
+#create age/sex disagg
+  df_ppr <- df_ppr %>% 
+    mutate(disagg = ifelse(ismcad=="Y", paste(age, sex, sep="/"), "Total")) %>%
 	
-	#apply offical names before aggregating (since same mech id may have multiple partner/mech names)  
-	 source(here("Scripts", "officialnames.R"))
-	 df_ppr <- officialnames(df_ppr, here("RawData"))  
+#apply offical names before aggregating (since same mech id may have multiple partner/mech names)  
+  source(here("Scripts", "officialnames.R"))
+  df_ppr <- officialnames(df_ppr, here("RawData"))  
 	 
-  #aggregate by subset variable list
+#aggregate by subset variable list
    group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
-                  fundingagency, primepartner, mechanismid, implementingmechanismname,
-                  indicator, disagg) %>%
+            fundingagency, primepartner, mechanismid, implementingmechanismname,
+            indicator, disagg) %>%
    summarize_at(vars(starts_with("fy")), funs(sum(., na.rm=TRUE))) %>%
    ungroup()
 
@@ -80,11 +80,11 @@ datafv <- "~/ICPI/Data"
 	    drop_na(value) %>%
 	    spread(period, value) %>%
 
-	    select(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
-	           fundingagency, primepartner, mechanismid, implementingmechanismname,
-	           indicator, disagg, fy2015q2, fy2015q3, fy2015q4, fy2015apr, fy2016_targets,
-	           fy2016q1, fy2016q2, fy2016q2, fy2016q3, fy2016q4, fy2016apr, fy2017_targets,
-	           fy2017q1, fy2017q2, fy2017q3, fy2017q4, fy2017cum)
+	    # select(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
+	    #        fundingagency, primepartner, mechanismid, implementingmechanismname,
+	    #        indicator, disagg, fy2015q2, fy2015q3, fy2015q4, fy2015apr, fy2016_targets,
+	    #        fy2016q1, fy2016q2, fy2016q2, fy2016q3, fy2016q4, fy2016apr, fy2017_targets,
+	    #        fy2017q1, fy2017q2, fy2017q3, fy2017q4, fy2017cum)
 	    
 	
 	
