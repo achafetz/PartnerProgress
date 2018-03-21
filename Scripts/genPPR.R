@@ -21,9 +21,9 @@ library(here)
 datapathfv <- "~/ICPI/Data"
 
 #Which outputs to produce? 0 = No, 1 = Yes
-  #global_output <-  1 //full global dataset
-  #equip_output <- 0 //full global dataset
-  #ctry_output <- 1 	//one dataset for every OU
+  output_global <-  1 #full global dataset
+  #equip_output <- 0  #just EQUIP
+  output_ctry <- 1 	#one dataset for every OU
   #sel_output <- 0	//just an outut for select OU specified below
   #sel_output_list <- "Zambia"  //OU selection
 
@@ -35,7 +35,9 @@ datapathfv <- "~/ICPI/Data"
 	source(here("Scripts", "currentperiod.R"))
 	curr_q <- currentpd(df_mer, "quarter")
 	curr_fy <- currentpd(df_mer, "year")
-	fy_print <- currentpd(df_mer, "full") %>% toupper()
+	fy_save <- 
+	  currentpd(df_mer, "full") %>% 
+	  toupper()
 	
 #create future filler columns
 	source(here("Scripts", "futurefiller.R"))
@@ -88,10 +90,19 @@ datapathfv <- "~/ICPI/Data"
 #set today's date for saving
 	date <- format(Sys.Date(), format="%Y%m%d")
 
-#export full dataset
-if(output_global == TRUE){
-  print("GLOBAL OUTPUT")
-  filename <- paste("PPRdata", "GLOBAL", fy_print, date, sep = "_") %>% paste0(., ".txt")
-  write_tsv(df_ppr, here("ExcelOutput", filename))
-}
+#export datasets
+	source(here("Scripts", "export.R"))
+	
+	#global
+  if(output_global == TRUE){
+    export("GLOBAL")
+  }
+  
+	#countries
+  if(output_ctry == TRUE){
+    ou_list <- df_ppr %>% 
+      distinct(operatingunit) %>% 
+      arrange(operatingunit)
+    purrr::map(.x = ou_list, .f = ~ export(.x))
+  }
 	
