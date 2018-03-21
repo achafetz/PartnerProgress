@@ -32,9 +32,14 @@ datafv <- "~/ICPI/Data"
 #import/open data	
 	fvdata <- read_rds(Sys.glob(file.path(datafv, "ICPI_FactView_PSNU_IM_*.Rds")))
 
+#find current quarter & fy
+	source(here("Scripts", "currentperiod.R"))
+	curr_q <- currentpd(df, "quarter")
+	curr_fy <- currentpd(df, "year")
+	
 #create future filler columns
 	source(here("Scripts", "futurefiller.R"))
-	fvdata <- fill_future_pds(fvdata)
+	fvdata <- fill_future_pds(fvdata, curr_fy, curr_q)
 	
 #SNU prioritizations
 	df_ppr <- fvdata %>% 
@@ -59,10 +64,6 @@ datafv <- "~/ICPI/Data"
 	#q4 
 	  ind_q4 <- c(ind_q3, "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT")
 	  
-	#determine which quarter it is
-	  source(here("Scripts", "currentperiod.R"))
-	  curr_q <- currrentpd(df_ppr, "quarter")
-	  
 	#filter to select indicators (based on quarter)
 	df_ppr <- fvdata %>% 
 	  filter(((indicator %in% get(paste0("ind_q", curr_q)) ) & disaggregate=="Total Numerator") |
@@ -76,8 +77,11 @@ datafv <- "~/ICPI/Data"
   	
 	#############################################
   source(here("Scripts", "officialnames.R"))
-  df_psnu_im <- officialnames(df_psnu_im, here("RawData")) 
-	 ###########################################
+  df_ppr <- officialnames(df_ppr, here("RawData")) 
+  
+  source(here("Scripts", "fy_cumulative.R"))
+  df_ppr <- fy_cumulative(df_ppr, curr_fy, curr_q)
+  
 	 
    #create age/sex disagg
 	  mutate(disagg = ifelse(ismcad=="Y", paste(age, sex, sep="/"), "Total")) %>%
