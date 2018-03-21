@@ -58,7 +58,7 @@ netnew <- function(df){
       dplyr::select(-ends_with("_nn"))
     
   #replace future quarters with zero (will get values for pd+1 and target/apr)
-    df_netnew <- fill_future_pds(df_netnew)
+    df_netnew <- fill_future_pds(df_netnew, curr_fy, curr_q)
     
   #append TX_NET_NEW onto main dataframe
     df <- bind_rows(df, df_netnew)
