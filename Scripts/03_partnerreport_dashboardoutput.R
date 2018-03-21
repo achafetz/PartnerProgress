@@ -18,7 +18,7 @@ library(tidyverse)
 library(here)
 
 #file directory for Fact View datasets
-datafv <- "~/ICPI/Data"
+datapathfv <- "~/ICPI/Data"
 
 #Which outputs to produce? 0 = No, 1 = Yes
   #global_output <-  1 //full global dataset
@@ -31,19 +31,19 @@ datafv <- "~/ICPI/Data"
 	date <- format(Sys.Date(), format="%Y%b%d")
 
 #import/open data	
-	df_mer <- read_rds(Sys.glob(file.path(datafv, "ICPI_FactView_PSNU_IM_*.Rds")))
-
+	df_mer <- read_rds(Sys.glob(file.path(datapathfv, "ICPI_FactView_PSNU_IM_*.Rds")))
+	
 #find current quarter & fy
 	source(here("Scripts", "currentperiod.R"))
-	curr_q <- currentpd(df, "quarter")
-	curr_fy <- currentpd(df, "year")
+	curr_q <- currentpd(df_mer, "quarter")
+	curr_fy <- currentpd(df_mer, "year")
 	
 #create future filler columns
 	source(here("Scripts", "futurefiller.R"))
 	df_mer <- fill_future_pds(df_mer, curr_fy, curr_q)
 	
 #subset to indicators of interest
-	source(here("Scripts", "filter_inds.R"))
+	source(here("Scripts", "filter_keyinds.R"))
 	df_ppr <- filter_keyinds(df_mer, curr_q)
 	
 #create net new and bind it on
