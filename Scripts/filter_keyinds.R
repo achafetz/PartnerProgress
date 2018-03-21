@@ -48,7 +48,6 @@ filter_keyinds <- function(df, qtr){
            disaggregate = ifelse((indicator %in% c("TB_ART_D", "TB_STAT_D")),"Total Numerator",disaggregate))
   
   #indicators to keep (based on the current quarter)
-   source(here("Scipts", "filter_keyinds.R"))
    ind_list <- key_ind(qtr)
   
   #filter to select indicators (based on quarter)
