@@ -11,7 +11,7 @@
 #' clean up names
 #' df_psnu_im <- officialnames(df_psnu_im, "~/Documents/")
 
-officalnames <- function(df, report_folder_path, report_start_year = 2014) {
+officialnames <- function(df, report_folder_path, report_start_year = 2014) {
 
   #import official mech and partner names; source: FACTS Info
   df_names <- read_excel(Sys.glob(file.path(report_folder_path,"*Standard COP Matrix Report*.xls")), skip = 1)
