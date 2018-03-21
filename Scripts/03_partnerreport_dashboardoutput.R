@@ -27,8 +27,6 @@ datapathfv <- "~/ICPI/Data"
   #sel_output <- 0	//just an outut for select OU specified below
   #sel_output_list <- "Zambia"  //OU selection
 
-#set today's date for saving
-	date <- format(Sys.Date(), format="%Y%b%d")
 
 #import/open data	
 	df_mer <- read_rds(Sys.glob(file.path(datapathfv, "ICPI_FactView_PSNU_IM_*.Rds")))
@@ -81,3 +79,9 @@ datapathfv <- "~/ICPI/Data"
 	
 	
 	test<- df_ppr %>% drop_na(fy2015q2:fy2017cum)
+	
+	
+	
+	#set today's date for saving
+	date <- format(Sys.Date(), format="%Y%b%d")
+	
