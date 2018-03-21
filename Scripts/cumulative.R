@@ -24,16 +24,14 @@ cumulative <- function(df, fy, qtr){
         return(df)
     } else {
     
-    #keep "meta" data 
-      df_meta <- df %>% 
-        dplyr::select_if(is.character)
-    #and any quarterly values from current fy
-      df_data <- df %>% 
-        dplyr::select(dplyr::starts_with(fy_str)) 
-    #join together
-      df_cum <- dplyr::bind_cols(df_meta, df_data)
-      
-      df_cum <- df_cum %>% 
+    #identify "metadata" columns to keep 
+      lst_meta <- df %>% 
+        dplyr::select_if(is.character) %>% 
+        names()
+    #aggregate curr fy quarters via reshape and summarize
+      df_cum <- df %>% 
+        #keep "metadata" and any quarterly values from current fy
+        dplyr::select(lst_meta, dplyr::starts_with(fy_str))  %>% 
         #reshape long (and then going to aggregate)
         tidyr::gather(pd, !!varname, dplyr::starts_with(fy_str), na.rm  = TRUE) %>% 
         #aggregating over all quaters, so remove
