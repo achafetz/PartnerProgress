@@ -52,15 +52,16 @@ datafv <- "~/ICPI/Data"
 #add cumulative value for fy
   source(here("Scripts", "cumulative.R"))
   df_ppr <- cumulative(df_ppr, curr_fy, curr_q)
- 
-#create age/sex disagg
-  df_ppr <- df_ppr %>% 
-    mutate(disagg = ifelse(ismcad=="Y", paste(age, sex, sep="/"), "Total")) %>%
-	
+
 #apply offical names before aggregating (since same mech id may have multiple partner/mech names)  
   source(here("Scripts", "officialnames.R"))
   df_ppr <- officialnames(df_ppr, here("RawData"))  
-	 
+  
+#clean up - create age/sex disagg & replace missing SNU prioritizations
+  df_ppr <- df_ppr %>% 
+    mutate(disagg = ifelse(ismcad=="Y", paste(age, sex, sep="/"), "Total"),
+           currentsnuprioritization = ifelse(is.na(currentsnuprioritization),"[not classified]", currentsnuprioritization))
+  
 #aggregate by subset variable list
    group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
             fundingagency, primepartner, mechanismid, implementingmechanismname,
@@ -68,10 +69,7 @@ datafv <- "~/ICPI/Data"
    summarize_at(vars(starts_with("fy")), funs(sum(., na.rm=TRUE))) %>%
    ungroup()
 
-  #SNU prioritizations
-   df_ppr <- df_ppr %>% 
-     mutate(currentsnuprioritization = ifelse(is.na(currentsnuprioritization),"[not classified]", currentsnuprioritization))
-	
+
 	#replace all 0's with NA
 	  df_ppr[df_ppr==0] <- NA
 	
