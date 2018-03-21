@@ -11,20 +11,20 @@
 #' 
 fill_future_pds <- function(df, fy, qtr){
 
-  #add new columns if not yet at qtr4  
+  #add new columns if not yet at q4  
   if(qtr != 4) {
-    #n+1 qtruater 
+    #n+1 quarter 
     new_qtrs <- qtr + 1 
-    #create new columns for n+1 quater to Q4
+    #create new columns for n+1 quarter to Q4
     for(i in new_qtrs:4){
       #define variable name, eg fy2018q2
-      varname <- paste0("fy", fy, "qtr", i)
+      varname <- paste0("fy", fy, "q", i)
       #create variable
       df <- df %>% 
         dplyr::mutate(!!varname := 0)
     }
     #create apr column
-    varname <- paste0(fy, "apr")
+    varname <- paste0("fy", fy, "apr")
     df <- df %>% 
       dplyr::mutate(!!varname := 0)
   }
