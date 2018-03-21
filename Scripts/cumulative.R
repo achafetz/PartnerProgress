@@ -2,7 +2,7 @@
 #'
 #' @param df data frame to apply 
 #' @param fy current fiscual year
-#' @param q current quarter
+#' @param qtr current quarter
 #'
 #' @importFrom dplyr %>%
 #'
@@ -21,25 +21,29 @@ cumulative <- function(df, fy, qtr){
     if(qtr == 4){
       df <- df %>% 
         mutate(!!varname := get(paste0("fy", fy, "apr")))
+        return(df)
     } else {
-      df_cum <- df %>% 
-        #keep "meta" data and any quarterly values from current fy
-        dplyr::select(region:ismcad, dplyr::starts_with(fy_str)) %>% 
+    
+    #keep "meta" data 
+      df_meta <- df %>% 
+        dplyr::select_if(is.character)
+    #and any quarterly values from current fy
+      df_data <- df %>% 
+        dplyr::select(dplyr::starts_with(fy_str)) 
+    #join together
+      df_cum <- dplyr::bind_cols(df_meta, df_data)
+      
+      df_cum <- df_cum %>% 
         #reshape long (and then going to aggregate)
         tidyr::gather(pd, !!varname, dplyr::starts_with(fy_str), na.rm  = TRUE) %>% 
-        #convert to character  for grouping
-        dplyr::mutate(coarsedisaggregate = as.character(coarsedisaggregate)) %>% 
         #aggregating over all quaters, so remove
         dplyr::select(-pd) %>% 
         #group by meta data
         dplyr::group_by_if(is.character) %>% 
         #aggregate to create cumulative value
         dplyr::summarise_at(vars(!!varname), ~ sum(.)) %>% 
-        dplyr::ungroup() %>% 
-        #convert back to logical for merging
-        dplyr::mutate(coarsedisaggregate = as.logical(coarsedisaggregate))
-     
-  
+        dplyr::ungroup()
+
      #merge cumulative back onto main df 
       df <- full_join(df, df_cum)
       
@@ -47,13 +51,14 @@ cumulative <- function(df, fy, qtr){
       semi_ann <- c("KP_PREV", "PP_PREV", "OVC_HIVSTAT", "OVC_SERV", "TB_ART",
                     "TB_STAT", "TX_TB", "GEND_GBV", "PMTCT_FO", "TX_RET", "KP_MAT")
       if(qtr %in% c(2, 3)) {
-        df <- dplyr::mutate(df, !!varname := ifelse(indicator %in% semi_ann, get(paste0(fy_str, "2")), !!varname))
+        df <- dplyr::mutate(df, !!varname := ifelse(indicator %in% semi_ann, get(paste0(fy_str, "2")), get(!!varname)))
       }
       
       #adjust snapshot indicators to equal current quarter
       snapshot <- c("TX_CURR")
-      df <- dplyr::mutate(df, !!varname := ifelse(indicator %in% snapshot, get(paste0(fy_str, qtr)), !!varname))
+      df <- dplyr::mutate(df, !!varname := ifelse(indicator %in% snapshot, get(paste0(fy_str, qtr)), get(!!varname)))
       
+      return(df)
     }
     
 }
