@@ -7,8 +7,9 @@
 
 ## NOTES
 #   - Data source: ICPI_Fact_View_PSNU_IM  [ICPI Data Store]
+#   - Need current COP Matrix report (renaming to official names)
 #   - Report aggregates DSD and TA
-#   - Report uses Totals and MCAD
+#   - Report looks at only Totals and MCAD
 
 ######################################################################################
 
@@ -69,21 +70,14 @@ datafv <- "~/ICPI/Data"
    summarize_at(vars(starts_with("fy")), funs(sum(., na.rm=TRUE))) %>%
    ungroup()
 
-
-	#replace all 0's with NA
+#replace all 0's with NA
 	  df_ppr[df_ppr==0] <- NA
-	
+	  
+#dropp missing rows
 	df_ppr <- df_ppr %>%
 	    gather(period, value, starts_with("fy"), na.rm = TRUE, factor_key = TRUE) %>%
 	    drop_na(value) %>%
 	    spread(period, value) %>%
-
-	    # select(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
-	    #        fundingagency, primepartner, mechanismid, implementingmechanismname,
-	    #        indicator, disagg, fy2015q2, fy2015q3, fy2015q4, fy2015apr, fy2016_targets,
-	    #        fy2016q1, fy2016q2, fy2016q2, fy2016q3, fy2016q4, fy2016apr, fy2017_targets,
-	    #        fy2017q1, fy2017q2, fy2017q3, fy2017q4, fy2017cum)
-	    
 	
 	
 	test<- df_ppr %>% drop_na(fy2015q2:fy2017cum)
