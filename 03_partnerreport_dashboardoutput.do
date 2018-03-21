@@ -65,7 +65,7 @@
 	replace key_ind=indicator if inlist(standardizeddisaggregate, "MostCompleteAgeDisagg", ///
 		"Modality/MostCompleteAgeDisagg") & indicator!="HTS_TST_NEG" & ///
 		inlist(sex, "Female", "Male", "Unknown Sex") & inlist(age, "<15", "15+")
-		replace key_ind = "" if otherdisaggregate=="Unknown Sex" 
+		replace key_ind = "" if otherdisaggregate=="Unknown Sex"
 
 *keep only key indicators
 	drop if key_ind=="" //only need data on key indicators
@@ -132,7 +132,7 @@
 * format disaggs
 	gen disagg = "Total"
 		replace disagg = age + "/" + sex if ismcad=="Y" & age!="Unknown Age"
-		
+
 * delete extrainous vars/obs
 	drop indicator
 	rename ïregion region
