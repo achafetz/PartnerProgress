@@ -13,10 +13,12 @@
 #' df_psnu_im <- officialnames(df_psnu_im, "~/Documents/")
 
 officialnames <- function(df, report_folder_path, report_start_year = 2014) {
-
+  
+  #TODO add warning if file does not exist; allow to skip
+  
   #import official mech and partner names; source: FACTS Info
-  df_names <- readr::read_excel(Sys.glob(file.path(report_folder_path,"*Standard COP Matrix Report*.xls")), skip = 1)
-
+  df_names <- readxl::read_excel(Sys.glob(file.path(report_folder_path,"*Standard COP Matrix Report*.xls")), skip = 1)
+  
   #rename variable stubs
   names(df_names) <- gsub("Prime Partner", "primepartner", names(df_names))
   names(df_names) <- gsub("Mechanism Name", "implementingmechanismname", names(df_names))
