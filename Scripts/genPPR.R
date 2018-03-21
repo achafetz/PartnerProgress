@@ -3,7 +3,7 @@
 ##   Aaron Chafetz
 ##   Purpose: generate output for Excel monitoring dashboard
 ##   Date: 2016-06-20 (STATA)
-##   Updated: 2018-03-19
+##   Updated: 2018-03-21
 
 ## NOTES
 #   - Data source: ICPI_Fact_View_PSNU_IM  [ICPI Data Store]
@@ -35,6 +35,7 @@ datapathfv <- "~/ICPI/Data"
 	source(here("Scripts", "currentperiod.R"))
 	curr_q <- currentpd(df_mer, "quarter")
 	curr_fy <- currentpd(df_mer, "year")
+	fy_print <- currentpd(df_mer, "full") %>% toupper()
 	
 #create future filler columns
 	source(here("Scripts", "futurefiller.R"))
@@ -83,8 +84,14 @@ datapathfv <- "~/ICPI/Data"
 #replace all 0's with NA
 	df_ppr[df_ppr==0] <- NA
 
-	
-	
+
 #set today's date for saving
-	date <- format(Sys.Date(), format="%Y%b%d")
+	date <- format(Sys.Date(), format="%Y%m%d")
+
+#export full dataset
+if(output_global == TRUE){
+  print("GLOBAL OUTPUT")
+  filename <- paste("PPRdata", "GLOBAL", fy_print, date, sep = "_") %>% paste0(., ".txt")
+  write_tsv(df_ppr, here("ExcelOutput", filename))
+}
 	
