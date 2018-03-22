@@ -29,7 +29,7 @@ datapathfv <- "~/ICPI/Data"
 
 
 #import/open data	
-	df_mer <- read_rds(Sys.glob(file.path(datapathfv, "ICPI_FactView_PSNU_IM_*.Rds")))
+	df_mer <- readr::read_rds(Sys.glob(file.path(datapathfv, "ICPI_FactView_PSNU_IM_*.Rds")))
 	
 #find current quarter & fy
 	source(here("Scripts", "currentperiod.R"))
@@ -57,23 +57,23 @@ datapathfv <- "~/ICPI/Data"
   
 #clean up - create age/sex disagg & replace missing SNU prioritizations
   df_ppr <- df_ppr %>% 
-    mutate(disagg = ifelse(ismcad=="Y", paste(age, sex, sep="/"), "Total"),
+    dplyr::mutate(disagg = ifelse(ismcad=="Y", paste(age, sex, sep="/"), "Total"),
            currentsnuprioritization = ifelse(is.na(currentsnuprioritization),"[not classified]", currentsnuprioritization))
   
 #aggregate by subset variable list
   df_ppr <- df_ppr %>%  
-    group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
+    dplyr::group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
               fundingagency, primepartner, mechanismid, implementingmechanismname,
               indicator, disagg) %>%
-     summarize_at(vars(starts_with("fy")), ~ sum(., na.rm=TRUE)) %>%
-     ungroup()
+    dplyr::summarize_at(vars(starts_with("fy")), ~ sum(., na.rm=TRUE)) %>%
+    dplyr::ungroup()
 
 #drop missing rows
 	df_ppr <- df_ppr %>%
-	    gather(period, value, starts_with("fy"), na.rm = TRUE, factor_key = TRUE) %>%
-	    mutate(value = ifelse(value == 0, NA, value)) %>% 
-	    drop_na(value) %>%
-	    spread(period, value)
+	  tidyr::gather(period, value, starts_with("fy"), na.rm = TRUE, factor_key = TRUE) %>%
+	  dplyr::mutate(value = ifelse(value == 0, NA, value)) %>% 
+	  tidyr::drop_na(value) %>%
+	  tidyr::spread(period, value)
 	
 #add future pds back in
 	source(here("Scripts", "futurefiller.R"))
@@ -100,9 +100,7 @@ datapathfv <- "~/ICPI/Data"
   
 	#countries
   if(output_ctry == TRUE){
-    ou_list <- df_ppr %>% 
-      distinct(operatingunit) %>% 
-      arrange(operatingunit)
+    ou_list <- unique(df_ppr$operatingunit)
     purrr::map(.x = ou_list, .f = ~ export(.x))
   }
 	
