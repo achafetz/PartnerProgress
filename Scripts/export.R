@@ -12,21 +12,19 @@
 #'  
 export <- function(opunit){
 
-  print(paste("export dataset: ", opunit))
+  print(paste("export dataset:", opunit))
   filename <- 
     paste("PPRdata", opunit, fy_save, date, sep = "_") %>% 
-    paste0(., ".txt")
+    paste0(., ".csv")
   
   if(opunit != "GLOBAL") {
-    df_ppr %>% 
-      dplyr::filter(operatingunit == opunit) %>% 
-      readr::write_tsv(here::here("ExcelOutput", filename))
+    df_x <- df_ppr %>% 
+      dplyr::filter(operatingunit == opunit) 
+    readr::write_csv(df_x, here::here("ExcelOutput", filename))
   } else {
-    df_ppr %>% 
-      readr::write_tsv(here::here("ExcelOutput", filename))
+    readr::write_csv(df_ppr, here::here("ExcelOutput", filename))
   }
     
 }
-
 
 
