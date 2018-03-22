@@ -21,9 +21,9 @@ library(here)
 datapathfv <- "~/ICPI/Data"
 
 #Which outputs to produce? 0 = No, 1 = Yes
-  output_global <-  1 #full global dataset
+  output_global <-  FALSE #full global dataset
   #equip_output <- 0  #just EQUIP
-  output_ctry <- 1 	#one dataset for every OU
+  output_ctry <- TRUE 	#one dataset for every OU
   #sel_output <- 0	//just an outut for select OU specified below
   #sel_output_list <- "Zambia"  //OU selection
 
