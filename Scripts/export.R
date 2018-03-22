@@ -20,9 +20,9 @@ export <- function(opunit){
   if(opunit != "GLOBAL") {
     df_x <- df_ppr %>% 
       dplyr::filter(operatingunit == opunit) 
-    readr::write_csv(df_x, here::here("ExcelOutput", filename))
+    readr::write_csv(df_x, here::here("ExcelOutput", filename), na = "")
   } else {
-    readr::write_csv(df_ppr, here::here("ExcelOutput", filename))
+    readr::write_csv(df_ppr, here::here("ExcelOutput", filename), na = "")
   }
     
 }
