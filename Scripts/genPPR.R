@@ -86,10 +86,6 @@ datapathfv <- "~/ICPI/Data"
 #replace all 0's with NA
 	df_ppr[df_ppr==0] <- NA
 
-
-#set today's date for saving
-	date <- format(Sys.Date(), format="%Y%m%d")
-
 #export datasets
 	source(here::here("Scripts", "export.R"))
 	
