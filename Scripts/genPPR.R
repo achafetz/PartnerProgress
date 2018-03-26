@@ -31,7 +31,7 @@
 
 genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, output_subset_type = NULL, ...){
   
-  sel_group <- quos(...)
+  sel_group <- dplyr::quos(...)
   
   #import/open data	
   	df_mer <- readr::read_rds(Sys.glob(file.path(datapathfv, "ICPI_FactView_PSNU_IM_*.Rds")))
