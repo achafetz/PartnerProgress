@@ -16,7 +16,7 @@ export <- function(opunit){
   filename <- 
     paste0("PPRdata_", opunit,"_", fy_save, ".csv") 
   
-  if(opunit != "GLOBAL") {
+  if(stringr::str_detect(opunit, "GLOBAL") == FALSE) {
     df_ppr %>% 
       dplyr::filter(operatingunit == opunit) %>% 
     readr::write_csv(here::here("ExcelOutput", filename), na = "")
