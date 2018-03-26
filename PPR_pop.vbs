@@ -9,34 +9,38 @@
     Public LastRow
     Public LastCol
     Public dataWkbk
+    Public pd
+    Public proj_path
+    Public release_type
+
 
 Sub PPR_pop()
 
     Application.ScreenUpdating = False
-    
+
     'set directory
-        ChDir "C:\Users\achafetz\Documents\GitHub\PartnerProgress\"
-        compl_fldr = "C:\Users\achafetz\Documents\GitHub\PartnerProgress\Reports\"
+        Set proj_path = Range("proj_path")
+        compl_fldr = proj_path & "Reports\"
     ' set template
         Set tmplWkbk = ActiveWorkbook
-    ' no site data now --> delete Site TX_NET_NEW tab
-        Application.DisplayAlerts = False
-        'Sheets("TX_NET_NEW Site").Delete
-        Application.DisplayAlerts = True
-    'for each OU
+    'unhide sheets
         Sheets("RawData").Visible = True
         Sheets("rs").Visible = True
+    'add dates for saving and release type (initial or clean)
         Sheets("rs").Activate
+        Set pd = Range("pd")
+        Set release_type = Range("release_type")
+    'for each OU
         Set SelectedOpUnits = Sheets("rs").Range(Cells(2, 10), Cells(37, 10))
         For Each OpUnit In SelectedOpUnits
             OpUnit_ns = Replace(Replace(OpUnit, " ", ""), "'", "")
         'create OU specific folder
-            OUpath = compl_fldr & OpUnit_ns & VBA.Format(Now, "yyyy.mm.dd")
+            OUpath = compl_fldr & "PPR_" & OpUnit_ns & pd
             If Len(Dir(OUpath, vbDirectory)) = 0 Then MkDir OUpath
             OUcompl_fldr = OUpath & "\"
         ' open csv
             Workbooks.Open Filename:= _
-                 "ExcelOutput\ICPIFactView_SNUbyIM_4Apr2017_" & OpUnit & ".csv" 'update date
+                 proj_path & "ExcelOutput\PPRdata_" & OpUnit & "_" & pd & ".csv"
             Set dataWkbk = ActiveWorkbook
         'count rows to import over
             LastRow = Range("A1").CurrentRegion.Rows.Count
@@ -55,9 +59,16 @@ Sub PPR_pop()
             ActiveWorkbook.RefreshAll
         'open to main page
             Sheets("Info").Select
+            ActiveSheet.Unprotect
+        'hard code date updated & protect
+            Range("C57").Value = "Updated: " & VBA.Format(Now, "yyyy-mm-dd")
+            Application.CutCopyMode = False
+            Range("C1").Select
+            ActiveSheet.Protect DrawingObjects:=True, Contents:=True, Scenarios:=True
+            ActiveSheet.EnableSelection = xlNoSelection
         'save OU specific file
             Application.DisplayAlerts = False
-            fname = OUcompl_fldr & OpUnit_ns & "_FY17Q1_PartnerProgressReport_v" & VBA.Format(Now, "yyyy.mm.dd") & ".xlsx" 'update quarter
+            fname = OUcompl_fldr & "PartnerProgressReport_" & OpUnit_ns & "_" & pd & release_type & "_" & VBA.Format(Now, "yyyymmdd") & ".xlsx"
             ActiveWorkbook.SaveAs Filename:=fname, FileFormat:=xlOpenXMLWorkbook
             Application.DisplayAlerts = True
         'clear out data for next OU
@@ -66,13 +77,13 @@ Sub PPR_pop()
             Range(Cells(3, 1), Cells(LastRow, LastCol)).Select
             Selection.Delete
             dataWkbk.Close
-    
+
     Call Zip_All_Files_in_Folder
-    
+
     Next OpUnit
-    
+
      Application.ScreenUpdating = True
-     
+
 End Sub
 
 
@@ -93,11 +104,11 @@ data pack and its supplementary files"
         If Right(DefPath, 1) <> "\" Then
             DefPath = DefPath & "\"
         End If
-    
+
         FolderName = OUcompl_fldr
-    
-        strDate = VBA.Format(Now, "yyyy.mm.dd")
-        FileNameZip = DefPath & OpUnit_ns & "PPR" & strDate & ".zip"
+
+        strDate = VBA.Format(Now, "yyyymmdd")
+        FileNameZip = DefPath & "PPR_" & OpUnit_ns & "_" & pd & release_type & "_" & strDate & ".zip"
     'Create empty Zip File
         NewZip (FileNameZip)
 
@@ -117,7 +128,7 @@ data pack and its supplementary files"
         'If Right(OUcompl_fldr, 1) <> "\" Then OUcompl_fldr = OUcompl_fldr & "\"
         'Kill OUcompl_fldr & "*.*"
         'RmDir OUcompl_fldr
-        
+
 End Sub
 
 
@@ -143,4 +154,3 @@ Function Split97(sStr As Variant, sdelim As String) As Variant
     Split97 = Evaluate("{""" & _
     Application.Substitute(sStr, sdelim, """,""") & """}")
 End Function
-
