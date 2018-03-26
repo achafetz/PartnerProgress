@@ -1,19 +1,15 @@
-# Partner Performance by SNU
-# A.Chafetz, USAID
-# Purpose: initialize packages, folder structure, and global file paths
-# Adapted from T. Essam, USAID
-# Updated: 8/31/17 
-
 #' Initialize folder structure with sub folders
 #'
+#' 
 #' @details 
+#' Purpose: initialize packages, folder structure, and global file paths
 #' Adapted from T. Essam, USAID [Stata]
 #' @param projectname name of the project
 #' @param projectpath path to the folder where you want your project to sit
 #' @param ... subfolders to add in list, c("x", "y")
 #'
 #' @examples
-#' initialize_fldr("NewProject", "~/GitHub", "RawData", "Documents", "Scripts", "Output")
+#' initialize_fldr("NewProject", "~/GitHub", "RawData", "Documents", "R", "Output")
 
 initialize_fldr <- function(projectname, projectpath, ...){
 

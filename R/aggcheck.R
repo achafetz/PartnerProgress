@@ -19,8 +19,8 @@ check <- function(filepath_fv, opunit){
   df_check <- readr::read_rds(filepath_fv) %>% 
     dplyr::filter(operatingunit == opunit)
   
-  source(here("Scripts", "currentperiod.R"))
-  source(here("Scripts", "filter_keyinds.R"))
+  source(here("R", "currentperiod.R"))
+  source(here("R", "filter_keyinds.R"))
   
   ind <-
     currentpd(df_check, "quarter") %>% 
