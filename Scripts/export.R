@@ -1,5 +1,6 @@
 #' Export as base dataset(s) for PPR template
 #'
+#' @param df dataframe to export
 #' @param opunit which operatingunit should an output be created for?
 #'
 #' @return
@@ -8,21 +9,21 @@
 #' @importFrom dplyr %>%
 #'
 #' @examples
-#'  export("Kenya")
+#'  export(df_mer, "Kenya")
 #'  
-export <- function(opunit){
+export <- function(df, opunit){
 
   print(paste("export dataset:", opunit))
   filename <- 
     paste0("PPRdata_", opunit,"_", fy_save, ".csv") 
   
   if(stringr::str_detect(opunit, "GLOBAL") == FALSE) {
-    df_ppr %>% 
+    df %>% 
       dplyr::filter(operatingunit == opunit) %>% 
     readr::write_csv(here::here("ExcelOutput", filename), na = "")
     invisible(df)
   } else {
-    readr::write_csv(df_ppr, here::here("ExcelOutput", filename), na = "")
+    readr::write_csv(df, here::here("ExcelOutput", filename), na = "")
   }
     
 }
