@@ -8,19 +8,19 @@
 #' @importFrom dplyr %>%
 #'
 #' @examples
-#'  df_mer <- export("Kenya")
+#'  export("Kenya")
 #'  
 export <- function(opunit){
 
   print(paste("export dataset:", opunit))
   filename <- 
-    paste("PPRdata", opunit, fy_save, date, sep = "_") %>% 
-    paste0(., ".csv")
+    paste0("PPRdata_", opunit,"_", fy_save, ".csv") 
   
   if(opunit != "GLOBAL") {
-    df_x <- df_ppr %>% 
-      dplyr::filter(operatingunit == opunit) 
-    readr::write_csv(df_x, here::here("ExcelOutput", filename), na = "")
+    df_ppr %>% 
+      dplyr::filter(operatingunit == opunit) %>% 
+    readr::write_csv(here::here("ExcelOutput", filename), na = "")
+    invisible(df)
   } else {
     readr::write_csv(df_ppr, here::here("ExcelOutput", filename), na = "")
   }
