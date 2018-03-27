@@ -7,6 +7,7 @@
 #' @export
 #'
 #' @importFrom dplyr %>%
+#' @importFrom dplyr vars
 #'
 #' @examples
 #' \dontrun{
