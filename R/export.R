@@ -3,9 +3,11 @@
 #' @param df dataframe to export
 #' @param opunit which operatingunit should an output be created for?
 #' @param savepd period to add to file name, eg FY2018Q1
-#'
+#' 
+#' @export
+#' 
 #' @importFrom dplyr %>%
-#'
+#' 
 #' @examples 
 #' \dontrun{
 #'  export(df_mer, "Kenya", "FY2018Q1") }

@@ -2,6 +2,8 @@
 #'
 #' @param df dataset to use/bind net new to
 #' 
+#' @export
+#' 
 #' @importFrom dplyr %>%
 #' 
 #' @examples

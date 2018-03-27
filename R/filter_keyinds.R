@@ -1,7 +1,9 @@
 #' Identify indicators of interest 
 #' 
 #' @param qtr current quarter
-#'
+#' 
+#' @export
+#' 
 #' @examples
 #' \dontrun{
 #' df_mer <- key_ind(1) }

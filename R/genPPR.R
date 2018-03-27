@@ -13,6 +13,8 @@
 #' @param output_subset_type select only subset, either "ou" or "mechid"
 #' @param ... add list of countries or mechanisms for `output_subset_type`, eg "18841", "14421"
 #' 
+#' @export
+#' 
 #' @examples
 #' \dontrun{
 #' #export global file

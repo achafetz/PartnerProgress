@@ -4,6 +4,8 @@
 #' @param fy current fiscual year
 #' @param qtr current quarter
 #'
+#' @export
+#' 
 #' @importFrom dplyr %>%
 #'
 #' @examples

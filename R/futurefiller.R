@@ -3,7 +3,9 @@
 #' @param df dataset to add future columns to
 #' @param fy current fiscal year
 #' @param qtr current quarter
-#'
+#' 
+#' @export
+#' 
 #' @importFrom dplyr %>%
 #' 
 #' @examples

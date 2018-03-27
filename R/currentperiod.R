@@ -2,7 +2,9 @@
 #'
 #' @param df dataset to use to find latest period 
 #' @param pd_type what is returned? (a) full, eg fy2018q1; (b)year, eg 2018; (c) or quarter, eg 1
-#'
+#' 
+#' @export
+#' 
 #' @importFrom dplyr %>%
 #'
 #' @examples
@@ -11,7 +13,7 @@
 #' currrentpd(df_mer, "quarter") }
 #' 
 currentpd <- function(df, pd_type = "full") {
-  #get list of headers
+  #get list of header
   headers <- names(df)
   #figure out column, keeping only variables that are a quarter
   pd <- headers[stringr::str_detect(headers, "q(?=[:digit:])")] %>% 

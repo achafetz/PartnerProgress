@@ -4,6 +4,8 @@
 #' @param opunit operatingunit to check 
 #' @param filepath_fv filepath to current PSNU_IM file 
 #'
+#' @export
+#' 
 #' @importFrom dplyr %>%
 #' 
 #' @examples

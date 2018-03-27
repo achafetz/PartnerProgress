@@ -2,7 +2,9 @@
 #' Exract PLHIV and POP for PPR context
 #'
 #' @param folderpath file path to the folder that contains the NAT_SUBNAT file
-#'
+#' 
+#' @export
+#' 
 #' @importFrom dplyr %>%
 #'
 #' @examples
