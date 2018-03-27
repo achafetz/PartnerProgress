@@ -17,5 +17,6 @@ cumulative(df, fy, qtr)
 Add cumulative value for current FY
 }
 \examples{
-df_mer <- cumulative(cumulative, 2018, 1)
+\dontrun{
+df_mer <- cumulative(cumulative, 2018, 1)}
 }

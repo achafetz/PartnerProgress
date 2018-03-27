@@ -13,6 +13,7 @@ key_ind(qtr)
 Identify indicators of interest
 }
 \examples{
-df_mer <- key_ind(1)
+\dontrun{
+df_mer <- key_ind(1) }
 
 }

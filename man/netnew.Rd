@@ -13,6 +13,7 @@ netnew(df)
 Generate NET_NEW variable
 }
 \examples{
-df_mer <- netnew(df_mer)
+\dontrun{
+df_mer <- netnew(df_mer) }
 
 }

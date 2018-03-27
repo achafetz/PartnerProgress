@@ -17,6 +17,7 @@ officialnames(df, report_folder_path, report_start_year = 2014)
 Some mechanisms and partners are recorded in FACTSInfo with multiple names over different time period. This function replaces all partner and mechanism names the most recent name for each mechanism ID from a FACTSInfo COP Matrix Report.
 }
 \examples{
+\dontrun{
 clean up names
-df_psnu_im <- officialnames(df_psnu_im, "~/Documents/")
+df_psnu_im <- officialnames(df_psnu_im, "~/Documents/") }
 }

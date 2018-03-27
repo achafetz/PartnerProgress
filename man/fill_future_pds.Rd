@@ -17,6 +17,7 @@ fill_future_pds(df, fy, qtr)
 Create/Fill future period columns with zero as placeholders
 }
 \examples{
-df_mer <- fill_future_pds(df_mer, 2018, 1)
+\dontrun{
+df_mer <- fill_future_pds(df_mer, 2018, 1) }
 
 }

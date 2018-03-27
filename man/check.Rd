@@ -14,3 +14,9 @@ check(filepath_fv, opunit)
 \description{
 Check OU Aggregate FV against PPR ouput from runPPR.R
 }
+\examples{
+\dontrun{
+check("ICPI/Data/REAL_ICPI_FactView_PSNU_IM_20180215_v1_3.Rds", "Malawi") }
+
+
+}

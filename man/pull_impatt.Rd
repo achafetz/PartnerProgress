@@ -13,6 +13,7 @@ pull_impatt(folderpath)
 Exract PLHIV and POP for PPR context
 }
 \examples{
-df_impatt <- pull_impatt("~/ICPI/Data")
+\dontrun{
+df_impatt <- pull_impatt("~/ICPI/Data") }
 
 }

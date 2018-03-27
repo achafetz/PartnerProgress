@@ -17,6 +17,7 @@ export(df, opunit, savepd)
 Export as base dataset(s) for PPR template
 }
 \examples{
- export(df_mer, "Kenya", "FY2018Q1")
+\dontrun{
+ export(df_mer, "Kenya", "FY2018Q1") }
  
 }

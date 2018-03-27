@@ -27,6 +27,7 @@ NOTES
   - Report looks at only Totals and MCAD
 }
 \examples{
+\dontrun{
 #export global file
   genPPR("~/ICPI/Data", output_ctry_all = FALSE)
 #view global file
@@ -36,6 +37,6 @@ NOTES
 #export just Malawi and Kenya
   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, output_subset_type = "ou", "Kenya", "Malawi")
 #export two mechanims
-  genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, output_subset_type = "mechid", "18234", "18544")
+  genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, output_subset_type = "mechid", "18234", "18544") }
   
 }

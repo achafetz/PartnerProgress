@@ -11,14 +11,12 @@ currentpd(df, pd_type = "full")
 
 \item{pd_type}{what is returned? (a) full, eg fy2018q1; (b)year, eg 2018; (c) or quarter, eg 1}
 }
-\value{
-last column/year/quarter
-}
 \description{
 Extract lastest period of dataset
 }
 \examples{
+\dontrun{
 currentpd(df_mer)
-currrentpd(df_mer, "quarter")
+currrentpd(df_mer, "quarter") }
 
 }

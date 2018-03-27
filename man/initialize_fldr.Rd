@@ -21,5 +21,6 @@ Purpose: initialize packages, folder structure, and global file paths
 Adapted from T. Essam, USAID [Stata]
 }
 \examples{
-initialize_fldr("NewProject", "~/GitHub", "RawData", "Documents", "R", "Output")
+\dontrun{
+initialize_fldr("NewProject", "~/GitHub", "RawData", "Documents", "R", "Output") }
 }
