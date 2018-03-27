@@ -13,7 +13,7 @@
 #' check("ICPI/Data/REAL_ICPI_FactView_PSNU_IM_20180215_v1_3.Rds", "Malawi") }
 #'
 #'
-check <- function(filepath_fv, opunit){
+pprcheck <- function(filepath_fv, opunit){
 
   here::here()
 
