@@ -31,7 +31,7 @@ check <- function(filepath_fv, opunit){
   df_check %>%
     dplyr::filter(indicator %in% ind, standardizeddisaggregate %in% c("Total Numerator","MostCompleteAgeDisagg", "Modality/MostCompleteAgeDisagg")) %>%
     dplyr::group_by(indicator, standardizeddisaggregate, age, sex) %>%
-    dplyr::summarise(!!pd = sum(!!pd, na.rm = TRUE)) %>%
+    dplyr::summarise(!!pd := sum(!!pd, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
     dplyr::arrange(indicator) %>%
     tidyr::unite(disagg, age, sex, sep = "/") %>%
