@@ -59,7 +59,7 @@ netnew <- function(df){
                     fy2018apr = fy2018q1_nn + fy2018q2_nn + fy2018q3_nn + fy2018q4_nn,
                     fy2018_targets = fy2018_targets_nn) %>%
   #remove original calculation
-      dplyr::select(-ends_with("_nn"))
+      dplyr::select(-dplyr::ends_with("_nn"))
     
   #replace future quarters with zero (will get values for pd+1 and target/apr)
     df_netnew <- fill_future_pds(df_netnew, curr_fy, curr_q)
