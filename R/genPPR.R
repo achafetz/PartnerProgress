@@ -12,11 +12,9 @@
 #' @param output_ctry_all export each country? logicial, default = TRUE
 #' @param output_subset_type select only subset, either "ou" or "mechid"
 #' @param ... add list of countries or mechanisms for `output_subset_type`, eg "18841", "14421"
-#'
-#' @return
-#' @export
-#'
+#' 
 #' @examples
+#' \dontrun{
 #' #export global file
 #'   genPPR("~/ICPI/Data", output_ctry_all = FALSE)
 #' #view global file
@@ -26,7 +24,7 @@
 #' #export just Malawi and Kenya
 #'   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, output_subset_type = "ou", "Kenya", "Malawi")
 #' #export two mechanims
-#'   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, output_subset_type = "mechid", "18234", "18544")
+#'   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, output_subset_type = "mechid", "18234", "18544") }
 #'   
 
 genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, output_subset_type = NULL, ...){

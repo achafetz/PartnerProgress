@@ -4,10 +4,11 @@
 #' @param fy current fiscal year
 #' @param qtr current quarter
 #'
-#' @importFrom dplyr everything
+#' @importFrom dplyr %>%
 #' 
 #' @examples
-#' df_mer <- fill_future_pds(df_mer, 2018, 1)
+#' \dontrun{
+#' df_mer <- fill_future_pds(df_mer, 2018, 1) }
 #' 
 fill_future_pds <- function(df, fy, qtr){
 

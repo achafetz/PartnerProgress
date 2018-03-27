@@ -4,13 +4,11 @@
 #' @param opunit which operatingunit should an output be created for?
 #' @param savepd period to add to file name, eg FY2018Q1
 #'
-#' @return
-#' @export 
-#' 
 #' @importFrom dplyr %>%
 #'
-#' @examples
-#'  export(df_mer, "Kenya", "FY2018Q1")
+#' @examples 
+#' \dontrun{
+#'  export(df_mer, "Kenya", "FY2018Q1") }
 #'  
 export <- function(df, opunit, savepd){
 

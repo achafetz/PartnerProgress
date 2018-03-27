@@ -3,13 +3,11 @@
 #'
 #' @param folderpath file path to the folder that contains the NAT_SUBNAT file
 #'
-#' @return
-#' @export
-#'
 #' @importFrom dplyr %>%
 #'
 #' @examples
-#' df_impatt <- pull_impatt("~/ICPI/Data")
+#' \dontrun{
+#' df_impatt <- pull_impatt("~/ICPI/Data") }
 #' 
 pull_impatt <- function(folderpath){
 

@@ -1,6 +1,5 @@
 #' Initialize folder structure with sub folders
 #'
-#' 
 #' @details 
 #' Purpose: initialize packages, folder structure, and global file paths
 #' Adapted from T. Essam, USAID [Stata]
@@ -9,7 +8,8 @@
 #' @param ... subfolders to add in list, c("x", "y")
 #'
 #' @examples
-#' initialize_fldr("NewProject", "~/GitHub", "RawData", "Documents", "R", "Output")
+#' \dontrun{
+#' initialize_fldr("NewProject", "~/GitHub", "RawData", "Documents", "R", "Output") }
 
 initialize_fldr <- function(projectname, projectpath, ...){
 

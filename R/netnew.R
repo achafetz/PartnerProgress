@@ -3,8 +3,10 @@
 #' @param df dataset to use/bind net new to
 #' 
 #' @importFrom dplyr %>%
+#' 
 #' @examples
-#' df_mer <- netnew(df_mer)
+#' \dontrun{
+#' df_mer <- netnew(df_mer) }
 #' 
 netnew <- function(df){
   

@@ -8,9 +8,11 @@
 #' @param report_start_year what is the start year of the COP Matrix Report, default's to 2014
 #'
 #' @importFrom dplyr %>%
+#' 
 #' @examples
+#' \dontrun{
 #' clean up names
-#' df_psnu_im <- officialnames(df_psnu_im, "~/Documents/")
+#' df_psnu_im <- officialnames(df_psnu_im, "~/Documents/") }
 
 officialnames <- function(df, report_folder_path, report_start_year = 2014) {
   

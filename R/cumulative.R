@@ -7,7 +7,8 @@
 #' @importFrom dplyr %>%
 #'
 #' @examples
-#' df_mer <- cumulative(cumulative, 2018, 1)
+#' \dontrun{
+#' df_mer <- cumulative(cumulative, 2018, 1)}
 
 
 cumulative <- function(df, fy, qtr){

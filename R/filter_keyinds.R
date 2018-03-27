@@ -3,7 +3,8 @@
 #' @param qtr current quarter
 #'
 #' @examples
-#' df_mer <- key_ind(1)
+#' \dontrun{
+#' df_mer <- key_ind(1) }
 #' 
 
 key_ind <- function(qtr){
@@ -44,8 +45,8 @@ filter_keyinds <- function(df, qtr){
   #rename denominator values _D
   df <- df %>% 
     dplyr::mutate(indicator = ifelse((indicator=="TB_ART" & standardizeddisaggregate=="Total Denominator"),"TB_ART_D",indicator),
-           indicator = ifelse((indicator=="TB_STAT" & standardizeddisaggregate=="Total Denominator"),"TB_STAT_D",indicator),
-           standardizeddisaggregate = ifelse((indicator %in% c("TB_ART_D", "TB_STAT_D")),"Total Numerator",standardizeddisaggregate))
+                  indicator = ifelse((indicator=="TB_STAT" & standardizeddisaggregate=="Total Denominator"),"TB_STAT_D",indicator),
+                  standardizeddisaggregate = ifelse((indicator %in% c("TB_ART_D", "TB_STAT_D")),"Total Numerator",standardizeddisaggregate))
   
   #indicators to keep (based on the current quarter)
    ind_list <- key_ind(qtr)
