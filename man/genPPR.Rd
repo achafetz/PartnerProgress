@@ -5,7 +5,7 @@
 \title{Generate PPR export data file}
 \usage{
 genPPR(datapathfv, output_global = TRUE, output_ctry_all = TRUE,
-  output_subset_type = NULL, ...)
+  df_return = FALSE, output_subset_type = NULL, ...)
 }
 \arguments{
 \item{datapathfv}{what is the file path to the Fact View dataset? eg "~/ICPI/Data"}
@@ -13,6 +13,8 @@ genPPR(datapathfv, output_global = TRUE, output_ctry_all = TRUE,
 \item{output_global}{export full dataset? logical, default = TRUE}
 
 \item{output_ctry_all}{export each country? logicial, default = TRUE}
+
+\item{df_return}{return a dataframe in R session, default = FALSE}
 
 \item{output_subset_type}{select only subset, either "ou" or "mechid"}
 
