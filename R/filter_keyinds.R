@@ -61,5 +61,3 @@ filter_keyinds <- function(df, qtr){
   
     #dplyr::filter(otherdisaggregate!="Unknown Sex")
 }
-
-#rm(list = ls(pattern = "^ind"))
