@@ -1,6 +1,8 @@
 #' Generate NET_NEW variable
 #'
 #' @param df dataset to use/bind net new to
+#' @param fy current fiscal year, eg 2018
+#' @param qtr current quarter, eg 1
 #' 
 #' @export
 #' 
@@ -8,9 +10,9 @@
 #' 
 #' @examples
 #' \dontrun{
-#' df_mer <- netnew(df_mer) }
+#' df_mer <- netnew(df_mer, 2018, 1) }
 #' 
-netnew <- function(df){
+netnew <- function(df, fy, qtr){
   
   #filter df, keeping just TX_CURR, replacing NA with 0 (for calculation), and renameing TX_NET_NEW
     df_netnew <- df %>%
@@ -62,8 +64,8 @@ netnew <- function(df){
       dplyr::select(-dplyr::ends_with("_nn"))
     
   #replace future quarters with zero (will get values for pd+1 and target/apr)
-    df_netnew <- fill_future_pds(df_netnew, curr_fy, curr_q)
+    df_netnew <- fill_future_pds(df_netnew, fy, qtr)
     
   #append TX_NET_NEW onto main dataframe
-    df <- bind_rows(df, df_netnew)
+    df <- dplyr::bind_rows(df, df_netnew)
 }

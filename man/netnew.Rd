@@ -4,16 +4,20 @@
 \alias{netnew}
 \title{Generate NET_NEW variable}
 \usage{
-netnew(df)
+netnew(df, fy, qtr)
 }
 \arguments{
 \item{df}{dataset to use/bind net new to}
+
+\item{fy}{current fiscal year, eg 2018}
+
+\item{qtr}{current quarter, eg 1}
 }
 \description{
 Generate NET_NEW variable
 }
 \examples{
 \dontrun{
-df_mer <- netnew(df_mer) }
+df_mer <- netnew(df_mer, 2018, 1) }
 
 }
