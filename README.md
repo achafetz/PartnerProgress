@@ -18,7 +18,7 @@ The package is used to create the data output that underlies the ICPI Partner Pr
 ```
 #convert Fact Viewv from .txt to .RDS
  read_fv("ICPI_FactView_PSNU_IM_20180215_v1_3.txt", path = "~/ICPI/Data")
-#setup any missing folders 
+#setup any missing folders
   initialize_fldr("PartnerProgress", "~/GitHub", "RawData", "Documents", "R", "ExcelOutput")
 ```
 
