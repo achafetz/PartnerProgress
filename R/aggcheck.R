@@ -20,9 +20,6 @@ pprcheck <- function(filepath_fv, opunit){
   df_check <- readr::read_rds(filepath_fv) %>%
     dplyr::filter(operatingunit == opunit)
 
-  source(here("R", "currentperiod.R"))
-  source(here("R", "filter_keyinds.R"))
-
   pd <- currentpd(df_check, "full")
   ind <-
     currentpd(df_check, "quarter") %>%

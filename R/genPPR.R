@@ -40,7 +40,6 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, out
   	df_mer <- readr::read_rds(Sys.glob(file.path(datapathfv, "ICPI_FactView_PSNU_IM_*.Rds")))
 
   #find current quarter & fy
-  	source(here::here("R", "currentperiod.R"))
   	curr_q <- currentpd(df_mer, "quarter")
   	curr_fy <- currentpd(df_mer, "year")
   	fy_save <-
@@ -48,19 +47,15 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, out
   	  toupper()
 
   #create future filler columns
-  	source(here::here("R", "futurefiller.R"))
   	df_mer <- fill_future_pds(df_mer, curr_fy, curr_q)
 
   #subset to indicators of interest
-  	source(here::here("R", "filter_keyinds.R"))
   	df_ppr <- filter_keyinds(df_mer, curr_q)
 
   #create net new and bind it on
-  	source(here::here("R", "netnew.R"))
   	df_ppr <- netnew(df_ppr, curr_fy, curr_q)
 
   #apply offical names before aggregating (since same mech id may have multiple partner/mech names)
-    source(here::here("R", "officialnames.R"))
     df_ppr <- officialnames(df_ppr, here::here("RawData"))
     
   #clean up - create age/sex disagg & replace missing SNU prioritizations
@@ -84,18 +79,15 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, out
   	  tidyr::spread(period, value)
 
   #add future pds back in
-  	source(here::here("R", "futurefiller.R"))
   	df_ppr <- fill_future_pds(df_ppr, curr_fy, curr_q)
 
   #add cumulative value for fy
-  	source(here::here("R", "cumulative.R"))
   	df_ppr <- cumulative(df_ppr, curr_fy, curr_q)
 
   #replace all 0's with NA
   	df_ppr[df_ppr==0] <- NA
 
   #export datasets
-  	source(here::here("R", "export.R"))
 
   	#global
     if(output_global == TRUE){
