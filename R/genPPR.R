@@ -10,6 +10,7 @@
 #' @param datapathfv what is the file path to the Fact View dataset? eg "~/ICPI/Data"
 #' @param output_global export full dataset? logical, default = TRUE
 #' @param output_ctry_all export each country? logicial, default = TRUE
+#' @param df_return return a dataframe in R session, default = FALSE
 #' @param output_subset_type select only subset, either "ou" or "mechid"
 #' @param ... add list of countries or mechanisms for `output_subset_type`, eg "18841", "14421"
 #'
@@ -32,9 +33,7 @@
 #'   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, output_subset_type = "mechid", "18234", "18544") }
 #'
 
-genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, output_subset_type = NULL, ...){
-
-  sel_group <- dplyr::quos(...)
+genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, output_subset_type = NULL, ...){
 
   #import/open data
   	df_mer <- readr::read_rds(Sys.glob(file.path(datapathfv, "ICPI_FactView_PSNU_IM_*.Rds")))
@@ -100,14 +99,19 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, out
       purrr::map(.x = ou_list, .f = ~ export(df_ppr, .x, , fy_save))
     }
 
-  	#select output -  OUs or mechs
+  	#capture selection to filter df to
+  	group <- dplyr::quos(...)
+  	
+  	#export selection
   	if(!is.null(output_subset_type) && output_subset_type == "ou"){
-  	  ou_list <- C(!!! sel_group)
-  	  purrr::map(.x = ou_list, .f = ~ export(df_ppr, .x, fy_save))
+  	  purrr::map(.x = group, .f = ~ export(df_ppr, .x, fy_save))
   	} else if(!is.null(output_subset_type) && output_subset_type == "mechid"){
-  	  dplyr::filter(mechanismid %in% c(!!! sel_group)) %>%
-  	  export(df_ppr, "GLOBAL_SelectMechs", fy_save)
+  	  dplyr::filter(df_ppr, mechanismid %in% c(!!!group)) %>%
+  	    export("GLOBAL_SelectMechs", fy_save)
   	}
   
-  return(df_ppr)
+  	#output data frame
+  	if(df_return == TRUE) {
+  	  return(df_ppr)
+    }
 }
