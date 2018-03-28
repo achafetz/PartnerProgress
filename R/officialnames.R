@@ -64,11 +64,11 @@ officialnames <- function(df, report_folder_path, report_start_year = 2014) {
   df <- dplyr::mutate(df, mechanismid = as.character(mechanismid))
 
   #merge in official names
-  df <- left_join(df, df_names, by="mechanismid")
+  df <- dplyr::left_join(df, df_names, by="mechanismid")
 
   #replace prime partner and mech names with official names
   df <- df %>%
     dplyr::mutate(implementingmechanismname = ifelse(is.na(implementingmechanismname_F), implementingmechanismname, implementingmechanismname_F),
            primepartner = ifelse(is.na(primepartner_F), primepartner, primepartner_F)) %>%
-    dplyr::select(-ends_with("_F"))
+    dplyr::select(-dplyr::ends_with("_F"))
 }

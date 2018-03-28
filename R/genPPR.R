@@ -57,7 +57,7 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, out
 
   #create net new and bind it on
   	source(here::here("R", "netnew.R"))
-  	df_ppr <- netnew(df_ppr)
+  	df_ppr <- netnew(df_ppr, curr_fy, curr_q)
 
   #apply offical names before aggregating (since same mech id may have multiple partner/mech names)
     source(here::here("R", "officialnames.R"))
@@ -73,12 +73,12 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, out
       dplyr::group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
                 fundingagency, primepartner, mechanismid, implementingmechanismname,
                 indicator, disagg) %>%
-      dplyr::summarize_at(dplyr::vars(starts_with("fy")), ~ sum(., na.rm=TRUE)) %>%
+      dplyr::summarize_at(dplyr::vars(dplyr::starts_with("fy")), ~ sum(., na.rm=TRUE)) %>%
       dplyr::ungroup()
 
   #drop missing rows
   	df_ppr <- df_ppr %>%
-  	  tidyr::gather(period, value, starts_with("fy"), na.rm = TRUE, factor_key = TRUE) %>%
+  	  tidyr::gather(period, value, dplyr::starts_with("fy"), na.rm = TRUE, factor_key = TRUE) %>%
   	  dplyr::mutate(value = ifelse(value == 0, NA, value)) %>%
   	  tidyr::drop_na(value) %>%
   	  tidyr::spread(period, value)
@@ -116,5 +116,6 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, out
   	  dplyr::filter(mechanismid %in% c(!!! sel_group)) %>%
   	  export(df_ppr, "GLOBAL_SelectMechs", fy_save)
   	}
-
+  
+  return(df_ppr)
 }

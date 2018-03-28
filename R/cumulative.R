@@ -47,7 +47,7 @@ cumulative <- function(df, fy, qtr){
         dplyr::ungroup()
 
      #merge cumulative back onto main df
-      df <- full_join(df, df_cum)
+      df <- dplyr::full_join(df, df_cum)
 
       #adjust semi annual indicators
       semi_ann <- c("KP_PREV", "PP_PREV", "OVC_HIVSTAT", "OVC_SERV", "TB_ART",
