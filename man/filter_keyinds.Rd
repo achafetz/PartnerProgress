@@ -15,6 +15,7 @@ filter_keyinds(df, qtr)
 Subset dataframe to just relevant indicators
 }
 \examples{
-df_ppr <- filter_keyinds(df_mer, 1)
+\dontrun{
+df_ppr <- filter_keyinds(df_mer, 1)  }
 
 }

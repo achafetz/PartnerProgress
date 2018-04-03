@@ -38,7 +38,8 @@ key_ind <- function(qtr){
 #' @importFrom dplyr %>%
 #'
 #' @examples
-#' df_ppr <- filter_keyinds(df_mer, 1)
+#' \dontrun{
+#' df_ppr <- filter_keyinds(df_mer, 1)  }
 #' 
 
 
