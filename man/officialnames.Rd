@@ -4,7 +4,7 @@
 \alias{officialnames}
 \title{Cleanup Mechanism and Partner Names to their Official Names}
 \usage{
-officialnames(df, report_folder_path, report_start_year = 2014)
+officialnames(df, report_folder_path, report_start_year = 2016)
 }
 \arguments{
 \item{df}{identify the FactView data frame to clean}

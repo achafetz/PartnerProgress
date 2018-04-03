@@ -16,9 +16,12 @@
 #' clean up names
 #' df_psnu_im <- officialnames(df_psnu_im, "~/Documents/") }
 
-officialnames <- function(df, report_folder_path, report_start_year = 2014) {
+officialnames <- function(df, report_folder_path, report_start_year = 2016) {
   
-  #TODO add warning if file does not exist; allow to skip
+  #check that COP Matrix Report exists and is in raw data folder
+  if(!file.exists(Sys.glob(file.path(report_folder_path,"*Standard COP Matrix Report*.xls")))){
+    stop('Download FACTSInfo COP Matrix Report (instructions - https://goo.gl/hkDVjz) or re-identify folder path before continuing.')
+  }
   
   #import official mech and partner names; source: FACTS Info
   df_names <- readxl::read_excel(Sys.glob(file.path(report_folder_path,"*Standard COP Matrix Report*.xls")), skip = 1)
