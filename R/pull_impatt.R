@@ -13,7 +13,7 @@
 #' 
 pull_impatt <- function(folderpath){
 
-  df <- readr::read_rds(Sys.glob(file.path(folderpath, "ICPI_FactView_NAT_SUBNAT_*.Rds")))
+  df <- readr::read_rds(Sys.glob(file.path(folderpath, "ICPI_MER_Structured_Dataset_NAT_SUBNAT_*.Rds")))
   
   #TEMP, need updated dataset with actually names and fy18 data
     df <- df %>% 
