@@ -7,7 +7,7 @@
 officialnames(df, report_folder_path, report_start_year = 2016)
 }
 \arguments{
-\item{df}{identify the FactView data frame to clean}
+\item{df}{identify the MER Structured data frame to clean}
 
 \item{report_folder_path}{file path to the parent folder?}
 

@@ -8,7 +8,7 @@ genPPR(datapathfv, output_global = TRUE, output_ctry_all = TRUE,
   df_return = FALSE, output_subset_type = NULL, ...)
 }
 \arguments{
-\item{datapathfv}{what is the file path to the Fact View dataset? eg "~/ICPI/Data"}
+\item{datapathfv}{what is the file path to the ICPI MER Structured dataset? eg "~/ICPI/Data"}
 
 \item{output_global}{export full dataset? logical, default = TRUE}
 
@@ -23,7 +23,7 @@ genPPR(datapathfv, output_global = TRUE, output_ctry_all = TRUE,
 \description{
 Purpose: generate output for Excel monitoring dashboard
 NOTES
-  - Data source: ICPI_Fact_View_PSNU_IM  [ICPI Data Store]
+  - Data source: ICPI_MER_Structured_Dataset_PSNU_IM  [ICPI Data Store]
   - Need current COP Matrix report (renaming to official names)
   - Report aggregates DSD and TA
   - Report looks at only Totals and MCAD

@@ -2,7 +2,7 @@
 % Please edit documentation in R/aggcheck.R
 \name{pprcheck}
 \alias{pprcheck}
-\title{Check OU Aggregate FV against PPR ouput from runPPR.R}
+\title{Check OU Aggregate MER Structured Dataset against PPR ouput from runPPR.R}
 \usage{
 pprcheck(filepath_fv, opunit)
 }
@@ -12,11 +12,11 @@ pprcheck(filepath_fv, opunit)
 \item{opunit}{operatingunit to check}
 }
 \description{
-Check OU Aggregate FV against PPR ouput from runPPR.R
+Check OU Aggregate MER Structured Dataset against PPR ouput from runPPR.R
 }
 \examples{
 \dontrun{
-check("ICPI/Data/REAL_ICPI_FactView_PSNU_IM_20180215_v1_3.Rds", "Malawi") }
+check("ICPI/Data/ICPI_MER_Structured_Dataset_PSNU_IM_20180215_v1_3.Rds", "Malawi") }
 
 
 }
