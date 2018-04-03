@@ -94,9 +94,9 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, df_
     }
 
   	#countries
-    if(output_ctry_all == TRUE && output_subset_type != "ou"){
+    if(output_ctry_all == TRUE){
       ou_list <- unique(df_ppr$operatingunit)
-      purrr::map(.x = ou_list, .f = ~ export(df_ppr, .x, , fy_save))
+      purrr::map(.x = ou_list, .f = ~ export(df_ppr, .x, fy_save))
     }
 
   	#capture selection to filter df to
