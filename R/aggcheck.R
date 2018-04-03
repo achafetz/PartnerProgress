@@ -1,5 +1,5 @@
 
-#' Check OU Aggregate FV against PPR ouput from runPPR.R
+#' Check OU Aggregate MER Structured Dataset against PPR ouput from runPPR.R
 #'
 #' @param opunit operatingunit to check
 #' @param filepath_fv filepath to current PSNU_IM file
@@ -10,7 +10,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' check("ICPI/Data/REAL_ICPI_FactView_PSNU_IM_20180215_v1_3.Rds", "Malawi") }
+#' check("ICPI/Data/ICPI_MER_Structured_Dataset_PSNU_IM_20180215_v1_3.Rds", "Malawi") }
 #'
 #'
 pprcheck <- function(filepath_fv, opunit){

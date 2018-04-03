@@ -3,7 +3,7 @@
 #'
 #' Some mechanisms and partners are recorded in FACTSInfo with multiple names over different time period. This function replaces all partner and mechanism names the most recent name for each mechanism ID from a FACTSInfo COP Matrix Report.
 #'
-#' @param df identify the FactView data frame to clean
+#' @param df identify the MER Structured data frame to clean
 #' @param report_folder_path file path to the parent folder?
 #' @param report_start_year what is the start year of the COP Matrix Report, default's to 2014
 #' 
@@ -53,7 +53,7 @@ officialnames <- function(df, report_folder_path, report_start_year = 2016) {
     dplyr::filter(year==max(year)) %>%
     dplyr::ungroup() %>%
 
-    #reshape wide so primepartner and implementingmechanismname are two seperate columsn to match fact view dataset
+    #reshape wide so primepartner and implementingmechanismname are two seperate columns to match MERstructured dataset
     tidyr::spread(type, name) %>%
 
     #convert mechanism id to string for merging back onto main df

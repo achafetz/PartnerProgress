@@ -2,12 +2,12 @@
 #'
 #' Purpose: generate output for Excel monitoring dashboard
 #' NOTES
-#'   - Data source: ICPI_Fact_View_PSNU_IM  [ICPI Data Store]
+#'   - Data source: ICPI_MER_Structured_Dataset_PSNU_IM  [ICPI Data Store]
 #'   - Need current COP Matrix report (renaming to official names)
 #'   - Report aggregates DSD and TA
 #'   - Report looks at only Totals and MCAD
 #'
-#' @param datapathfv what is the file path to the Fact View dataset? eg "~/ICPI/Data"
+#' @param datapathfv what is the file path to the ICPI MER Structured dataset? eg "~/ICPI/Data"
 #' @param output_global export full dataset? logical, default = TRUE
 #' @param output_ctry_all export each country? logicial, default = TRUE
 #' @param df_return return a dataframe in R session, default = FALSE
@@ -36,7 +36,7 @@
 genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, output_subset_type = NULL, ...){
 
   #import/open data
-  	df_mer <- readr::read_rds(Sys.glob(file.path(datapathfv, "ICPI_FactView_PSNU_IM_*.Rds")))
+  	df_mer <- readr::read_rds(Sys.glob(file.path(datapathfv, "ICPI_MER_Structured_Dataset_PSNU_IM_*.Rds")))
 
   #find current quarter & fy
   	curr_q <- currentpd(df_mer, "quarter")
