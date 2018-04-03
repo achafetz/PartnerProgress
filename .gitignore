@@ -1,6 +1,7 @@
 #data files
 *.csv
 *.xlsx
+*.xls
 *.xlsm
 *.dta
 *.txt
