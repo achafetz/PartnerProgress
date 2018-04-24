@@ -46,8 +46,8 @@ combine_netnew <- function(df){
       tidyr::spread(pd, val)
     
   #join all net new pds/targets/apr together
-    df_combo <- full_join(df_nn_result, df_nn_target)
-    df_combo <- full_join(df_combo, df_nn_apr)
+    df_combo <- dplyr::full_join(df_nn_result, df_nn_target)
+    df_combo <- dplyr::full_join(df_combo, df_nn_apr)
   
   #add dropped values back in and reoder to append onto original dataframe
     df_combo <- df_combo %>% 
