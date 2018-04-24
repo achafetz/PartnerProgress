@@ -7,7 +7,6 @@
 #' @param df data frame to apply
 #' @param fy current fy, eg 2018
 #'
-#' @return
 #' @export
 #'
 #' @importFrom dplyr %>%
