@@ -17,47 +17,49 @@ combine_netnew <- function(df){
   msd_order <- names(df)
   
   #keep TX_CURR to create net_new off of  
-  df <- df %>% 
-    dplyr::filter(indicator == "TX_CURR")
+    df <- df %>% 
+      dplyr::filter(indicator == "TX_CURR")
+    
   #ensure coarsedisggregate is a character for grouping
-  dplyr::mutate(coarsedisaggregate = as.character(coarsedisaggregate))
-  
+    df <- df %>% 
+       dplyr::mutate(coarsedisaggregate = as.character(coarsedisaggregate))
+    
   #create net new values for results and targets
-  df_nn_result <- gen_netnew(df, type = "result")
-  df_nn_target <- gen_netnew(df, type = "target")
+    df_nn_result <- gen_netnew(df, type = "result")
+    df_nn_target <- gen_netnew(df, type = "target")
   
   #create new new for apr by aggregating results data
-  df_nn_apr <- df_nn_result %>% 
-    #reshape long so years can be aggregated together
-    tidyr::gather(pd, val, starts_with("fy2")) %>%
-    #remove period, leaving just year to be aggregated together
-    dplyr::mutate(pd = stringr::str_remove(pd, "q[:digit:]"),
-                  pd = as.character(pd)) %>% 
-    #aggregate 
-    dplyr::group_by_if(is.character) %>%
-    dplyr::summarise(val = sum(val, na.rm = TRUE)) %>% 
-    dplyr::ungroup() %>% 
-    #rename year with apr to match structured dataset & replace 0's
-    dplyr::mutate(pd = paste0(pd, "apr"),
-                  val = ifelse(val==0, NA, val)) %>% 
-    #reshape wide to match MSD
-    tidyr::spread(pd, val)
-  
+    df_nn_apr <- df_nn_result %>% 
+      #reshape long so years can be aggregated together
+      tidyr::gather(pd, val, starts_with("fy2")) %>%
+      #remove period, leaving just year to be aggregated together
+      dplyr::mutate(pd = stringr::str_remove(pd, "q[:digit:]"),
+                    pd = as.character(pd)) %>% 
+      #aggregate 
+      dplyr::group_by_if(is.character) %>%
+      dplyr::summarise(val = sum(val, na.rm = TRUE)) %>% 
+      dplyr::ungroup() %>% 
+      #rename year with apr to match structured dataset & replace 0's
+      dplyr::mutate(pd = paste0(pd, "apr"),
+                    val = ifelse(val==0, NA, val)) %>% 
+      #reshape wide to match MSD
+      tidyr::spread(pd, val)
+    
   #join all net new pds/targets/apr together
-  df_combo <- full_join(df_nn_result, df_nn_target)
-  df_combo <- full_join(df_combo, df_nn_apr)
+    df_combo <- full_join(df_nn_result, df_nn_target)
+    df_combo <- full_join(df_combo, df_nn_apr)
   
   #add dropped values back in and reoder to append onto original dataframe
-  df_combo <- df_combo %>% 
-    dplyr::mutate(dataelementuid = NA,
-                  categoryoptioncombouid = NA,
-                  fy2015q3 = NA,
-                  fy2016q1 = NA,
-                  fy2016q3 = NA) %>% 
-    dplyr::select(msd_order)
-  
+    df_combo <- df_combo %>% 
+      dplyr::mutate(dataelementuid = NA,
+                    categoryoptioncombouid = NA,
+                    fy2015q3 = NA,
+                    fy2016q1 = NA,
+                    fy2016q3 = NA) %>% 
+      dplyr::select(msd_order)
+    
   #append TX_NET_NEW onto main dataframe
-  df_nn <- dplyr::bind_rows(df, df_combo)
+    df_nn <- dplyr::bind_rows(df, df_combo)
   
   return(df_nn)
   
