@@ -74,9 +74,6 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, df_
   	  tidyr::drop_na(value) %>%
   	  tidyr::spread(period, value)
 
-  #add future pds back in
-  	df_ppr <- fill_future_pds(df_ppr, curr_fy, curr_q)
-
   #add cumulative value for fy
   	df_ppr <- cumulative(df_ppr, curr_fy, curr_q)
 
