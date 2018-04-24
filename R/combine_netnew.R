@@ -101,7 +101,7 @@ gen_netnew <- function(df, type = "result"){
   
   #reshape long to subtract prior pd (keeping full set of pds to ensure nn = pd - pd_lag.1)
     df_nn <- df_nn %>% 
-      tidyr::gather(pd, val, dplyr::starts_with("fy2"), tidyr::factor_key = TRUE) %>% 
+      tidyr::gather(pd, val, dplyr::starts_with("fy2"), factor_key = TRUE) %>% 
       #fill all NAs with zero so net new can be calculated
       dplyr::mutate(val = ifelse(is.na(val), 0, val))
   
