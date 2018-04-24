@@ -31,7 +31,7 @@ combine_netnew <- function(df){
   #create new new for apr by aggregating results data
     df_nn_apr <- df_nn_result %>% 
       #reshape long so years can be aggregated together
-      tidyr::gather(pd, val, starts_with("fy2")) %>%
+      tidyr::gather(pd, val, dplyr::starts_with("fy2")) %>%
       #remove period, leaving just year to be aggregated together
       dplyr::mutate(pd = stringr::str_remove(pd, "q[:digit:]"),
                     pd = as.character(pd)) %>% 
