@@ -45,9 +45,6 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, df_
   	  currentpd(df_mer, "full") %>%
   	  toupper()
 
-  #create future filler columns
-  	df_mer <- fill_future_pds(df_mer, curr_fy, curr_q)
-
   #subset to indicators of interest
   	df_ppr <- filter_keyinds(df_mer, curr_q)
 
