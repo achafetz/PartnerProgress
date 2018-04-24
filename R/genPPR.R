@@ -67,13 +67,6 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, df_
       dplyr::summarize_at(dplyr::vars(dplyr::starts_with("fy")), ~ sum(., na.rm=TRUE)) %>%
       dplyr::ungroup()
 
-  #drop missing rows
-  	df_ppr <- df_ppr %>%
-  	  tidyr::gather(period, value, dplyr::starts_with("fy"), na.rm = TRUE, factor_key = TRUE) %>%
-  	  dplyr::mutate(value = ifelse(value == 0, NA, value)) %>%
-  	  tidyr::drop_na(value) %>%
-  	  tidyr::spread(period, value)
-
   #add cumulative value for fy
   	df_ppr <- cumulative(df_ppr, curr_fy, curr_q)
 
@@ -82,7 +75,14 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, df_
   
   #subset dataframe to just include needed value columns
   	df_ppr <- limit(df_ppr, curr_fy)
-
+  
+  #drop missing rows
+  	df_ppr <- df_ppr %>%
+  	  tidyr::gather(period, value, dplyr::starts_with("fy"), na.rm = TRUE, factor_key = TRUE) %>%
+  	  dplyr::mutate(value = ifelse(value == 0, NA, value)) %>%
+  	  tidyr::drop_na(value) %>%
+  	  tidyr::spread(period, value)
+  	
   #export datasets
 
   	#global
