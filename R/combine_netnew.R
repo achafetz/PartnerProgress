@@ -17,16 +17,16 @@ combine_netnew <- function(df){
   msd_order <- names(df)
   
   #keep TX_CURR to create net_new off of  
-    df <- df %>% 
+    df_tx <- df %>% 
       dplyr::filter(indicator == "TX_CURR")
     
   #ensure coarsedisggregate is a character for grouping
-    df <- df %>% 
+    df_tx <- df_tx %>% 
        dplyr::mutate(coarsedisaggregate = as.character(coarsedisaggregate))
     
   #create net new values for results and targets
-    df_nn_result <- gen_netnew(df, type = "result")
-    df_nn_target <- gen_netnew(df, type = "target")
+    df_nn_result <- gen_netnew(df_tx, type = "result")
+    df_nn_target <- gen_netnew(df_tx, type = "target")
   
   #create new new for apr by aggregating results data
     df_nn_apr <- df_nn_result %>% 
@@ -59,9 +59,9 @@ combine_netnew <- function(df){
       dplyr::select(msd_order)
     
   #append TX_NET_NEW onto main dataframe
-    df_nn <- dplyr::bind_rows(df, df_combo)
+    df <- dplyr::bind_rows(df, df_combo)
   
-  return(df_nn)
+  return(df)
   
 }
 
