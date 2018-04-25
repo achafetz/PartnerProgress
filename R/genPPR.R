@@ -45,18 +45,15 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, df_
   	  currentpd(df_mer, "full") %>%
   	  toupper()
 
-  #create future filler columns
-  	df_mer <- fill_future_pds(df_mer, curr_fy, curr_q)
-
   #subset to indicators of interest
   	df_ppr <- filter_keyinds(df_mer, curr_q)
 
-  #create net new and bind it on
-  	df_ppr <- netnew(df_ppr, curr_fy, curr_q)
-
   #apply offical names before aggregating (since same mech id may have multiple partner/mech names)
-    df_ppr <- officialnames(df_ppr, here::here("RawData"))
-    
+  	df_ppr <- officialnames(df_ppr, here::here("RawData"))
+  	
+  #create net new and bind it on
+  	df_ppr <- combine_netnew(df_ppr)
+
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
       dplyr::mutate(disagg = ifelse(ismcad=="Y", paste(age, sex, sep="/"), "Total"),
@@ -70,22 +67,22 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, df_
       dplyr::summarize_at(dplyr::vars(dplyr::starts_with("fy")), ~ sum(., na.rm=TRUE)) %>%
       dplyr::ungroup()
 
+  #add cumulative value for fy
+  	df_ppr <- cumulative(df_ppr, curr_fy, curr_q)
+
+  #replace all 0's with NA
+  	df_ppr[df_ppr==0] <- NA
+  
+  #subset dataframe to just include needed value columns
+  	df_ppr <- limit(df_ppr, curr_fy)
+  
   #drop missing rows
   	df_ppr <- df_ppr %>%
   	  tidyr::gather(period, value, dplyr::starts_with("fy"), na.rm = TRUE, factor_key = TRUE) %>%
   	  dplyr::mutate(value = ifelse(value == 0, NA, value)) %>%
   	  tidyr::drop_na(value) %>%
   	  tidyr::spread(period, value)
-
-  #add future pds back in
-  	df_ppr <- fill_future_pds(df_ppr, curr_fy, curr_q)
-
-  #add cumulative value for fy
-  	df_ppr <- cumulative(df_ppr, curr_fy, curr_q)
-
-  #replace all 0's with NA
-  	df_ppr[df_ppr==0] <- NA
-
+  	
   #export datasets
 
   	#global
