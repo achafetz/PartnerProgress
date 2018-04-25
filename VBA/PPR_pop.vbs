@@ -12,9 +12,14 @@
     Public pd
     Public proj_path
     Public release_type
+    Public rng
 
+Sub loadform()
+    'prompt for form to load to choose OUs to run
+    frmRunSel.Show
 
-Sub PPR_pop()
+End Sub
+Sub PPRpop()
 
     Application.ScreenUpdating = False
 
@@ -31,7 +36,9 @@ Sub PPR_pop()
         Set pd = Range("pd")
         Set release_type = Range("release_type")
     'for each OU
-        Set SelectedOpUnits = Sheets("rs").Range(Cells(2, 10), Cells(37, 10))
+        rng = Range("sel_ous_cnt").Value + 1
+        Set SelectedOpUnits = Sheets("rs").Range(Cells(2, 7), Cells(rng, 7))
+
         For Each OpUnit In SelectedOpUnits
             OpUnit_ns = Replace(Replace(OpUnit, " ", ""), "'", "")
         'create OU specific folder
@@ -83,6 +90,8 @@ Sub PPR_pop()
     Next OpUnit
 
      Application.ScreenUpdating = True
+
+    MsgBox ("Completed generating PPRs! Close out of this file and open template or report.")
 
 End Sub
 
