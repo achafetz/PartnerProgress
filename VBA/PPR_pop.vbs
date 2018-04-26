@@ -31,6 +31,20 @@ Sub PPRpop()
     'unhide sheets
         Sheets("RawData").Visible = True
         Sheets("rs").Visible = True
+    'update quartiles in Pivot Table Calculated fields
+        Sheets("Partner Comparison").Activate
+        'in quartile 1?
+        ActiveSheet.PivotTables("Partner Comparison").CalculatedFields("in-qtl_1"). _
+            StandardFormula = "= IF(Achieved<" & Range("qtl_1") & ",Achieved,0)"
+        'in quartile 2?
+        ActiveSheet.PivotTables("Partner Comparison").CalculatedFields("in-qtl_2"). _
+            StandardFormula = "= IF(AND(Achieved>=" & Range("qtl_1") & ",Achieved<=" & Range("qtl_2") & "),Achieved,0)"
+        'in quartile 3?
+        ActiveSheet.PivotTables("Partner Comparison").CalculatedFields("in-qtl_3"). _
+            StandardFormula = "=IF(AND(Achieved>" & Range("qtl_2") & ",Achieved<=" & Range("qtl_4") & "),Achieved,0)"
+        'in quartile 4?
+        ActiveSheet.PivotTables("Partner Comparison").CalculatedFields("in-qtl_4"). _
+            StandardFormula = "= IF(Achieved>" & Range("qtl_4") & ",Achieved,0)"
     'add dates for saving and release type (initial or clean)
         Sheets("rs").Activate
         Set pd = Range("pd")
