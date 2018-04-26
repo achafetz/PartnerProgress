@@ -49,6 +49,15 @@ Sub PPRpop()
         Sheets("rs").Activate
         Set pd = Range("pd")
         Set release_type = Range("release_type")
+    'open to main page
+       Sheets("Info").Select
+       ActiveSheet.Unprotect
+    'hard code date updated & protect
+        Range("C57").Value = "Updated: " & VBA.Format(Now, "yyyy-mm-dd")
+        Application.CutCopyMode = False
+        Range("C1").Select
+        ActiveSheet.Protect DrawingObjects:=True, Contents:=True, Scenarios:=True
+        ActiveSheet.EnableSelection = xlNoSelection
     'for each OU
         rng = Range("sel_ous_cnt").Value + 1
         Set SelectedOpUnits = Sheets("rs").Range(Cells(2, 7), Cells(rng, 7))
@@ -78,15 +87,6 @@ Sub PPRpop()
             Sheets("rs").Visible = False
         'refresh all pivot tables
             ActiveWorkbook.RefreshAll
-        'open to main page
-            Sheets("Info").Select
-            ActiveSheet.Unprotect
-        'hard code date updated & protect
-            Range("C57").Value = "Updated: " & VBA.Format(Now, "yyyy-mm-dd")
-            Application.CutCopyMode = False
-            Range("C1").Select
-            ActiveSheet.Protect DrawingObjects:=True, Contents:=True, Scenarios:=True
-            ActiveSheet.EnableSelection = xlNoSelection
         'save OU specific file
             Application.DisplayAlerts = False
             fname = OUcompl_fldr & "PartnerProgressReport_" & OpUnit_ns & "_" & pd & release_type & "_" & VBA.Format(Now, "yyyymmdd") & ".xlsx"
