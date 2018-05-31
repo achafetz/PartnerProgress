@@ -4,11 +4,11 @@
 \alias{genPPR}
 \title{Generate PPR export data file}
 \usage{
-genPPR(datapathfv, output_global = TRUE, output_ctry_all = TRUE,
+genPPR(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   df_return = FALSE, output_subset_type = NULL, ...)
 }
 \arguments{
-\item{datapathfv}{what is the file path to the ICPI MER Structured dataset? eg "~/ICPI/Data"}
+\item{folderpath_msd}{what is the folder path to the ICPI MER Structured dataset? eg "~/ICPI/Data"}
 
 \item{output_global}{export full dataset? logical, default = TRUE}
 

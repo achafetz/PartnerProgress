@@ -7,7 +7,7 @@
 #'   - Report aggregates DSD and TA
 #'   - Report looks at only Totals and MCAD
 #'
-#' @param datapathfv what is the file path to the ICPI MER Structured dataset? eg "~/ICPI/Data"
+#' @param folderpath_msd what is the folder path to the ICPI MER Structured dataset? eg "~/ICPI/Data"
 #' @param output_global export full dataset? logical, default = TRUE
 #' @param output_ctry_all export each country? logicial, default = TRUE
 #' @param df_return return a dataframe in R session, default = FALSE
@@ -33,18 +33,20 @@
 #'   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, output_subset_type = "mechid", "18234", "18544") }
 #'
 
-genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, output_subset_type = NULL, ...){
+genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, output_subset_type = NULL, ...){
 
   #import/open data
-  	df_mer <- readr::read_rds(Sys.glob(file.path(datapathfv, "ICPI_MER_Structured_Dataset_PSNU_IM_*.Rds")))
+  	df_mer <- readr::read_rds(Sys.glob(file.path(folderpath_msd, "ICPI_MER_Structured_Dataset_PSNU_IM_*.Rds")))
 
   #find current quarter & fy
-  	curr_q <- currentpd(df_mer, "quarter")
+  	curr_q  <- currentpd(df_mer, "quarter")
   	curr_fy <- currentpd(df_mer, "year")
-  	fy_save <-
-  	  currentpd(df_mer, "full") %>%
-  	  toupper()
-
+  	fy_save <- currentpd(df_mer, "full") %>%
+  	           toupper()
+  
+  #add MCAD variable for FY18 (only present prior to FY18)
+  	df_ppr <- add_mcad(df_ppr)
+  	
   #subset to indicators of interest
   	df_ppr <- filter_keyinds(df_mer, curr_q)
 
@@ -56,7 +58,7 @@ genPPR <- function(datapathfv, output_global = TRUE, output_ctry_all = TRUE, df_
 
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
-      dplyr::mutate(disagg = ifelse(ismcad=="Y", paste(age, sex, sep="/"), "Total"),
+      dplyr::mutate(disagg = ifelse(ismcad=="Y", paste(agecoarse, sex, sep="/"), "Total"),
              currentsnuprioritization = ifelse(is.na(currentsnuprioritization),"[not classified]", currentsnuprioritization))
 
   #aggregate by subset variable list
