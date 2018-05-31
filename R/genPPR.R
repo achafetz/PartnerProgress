@@ -61,7 +61,8 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
       dplyr::mutate(sex = ifelse(sex == "Unknown", "Unknown Sex", sex),
                     sex = ifelse(agecoarse == "<15", stringr::str_replace(sex, "Female|Male", "Unknown Sex"), sex),
                     disagg = ifelse(ismcad=="Y", paste(agecoarse, sex, sep="/"), "Total"),
-                    snuprioritization = ifelse(is.na(snuprioritization),"[not classified]", snuprioritization))
+                    snuprioritization = ifelse(is.na(snuprioritization),"[not classified]", snuprioritization)) %>% 
+      dplyr::filter(disagg != "15+/Unknown Sex") #only want Male/Female 15+
 
   #aggregate by subset variable list
     df_ppr <- df_ppr %>%
