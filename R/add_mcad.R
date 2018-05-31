@@ -3,7 +3,8 @@
 #' @param df data frame to add 
 #'
 #' @export
-#'
+#' @importFrom dplyr %>%
+#' 
 #' @examples
 #' \dontrun{
 #' df_mer <- add_mcad(df_mer) }

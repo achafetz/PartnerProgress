@@ -1,3 +1,4 @@
+Attribute VB_Name = "PPR_pop"
 'variables
     Public compl_fldr
     Public tmplWkbk
@@ -13,7 +14,7 @@
     Public proj_path
     Public release_type
     Public rng
-
+       
 Sub loadform()
     'prompt for form to load to choose OUs to run
     frmRunSel.Show
@@ -59,6 +60,7 @@ Sub PPRpop()
         ActiveSheet.Protect DrawingObjects:=True, Contents:=True, Scenarios:=True
         ActiveSheet.EnableSelection = xlNoSelection
     'for each OU
+        Sheets("rs").Select
         rng = Range("sel_ous_cnt").Value + 1
         Set SelectedOpUnits = Sheets("rs").Range(Cells(2, 7), Cells(rng, 7))
 
@@ -87,6 +89,8 @@ Sub PPRpop()
             Sheets("rs").Visible = False
         'refresh all pivot tables
             ActiveWorkbook.RefreshAll
+        'have user open to Info tab
+            Sheets("Info").Select
         'save OU specific file
             Application.DisplayAlerts = False
             fname = OUcompl_fldr & "PartnerProgressReport_" & OpUnit_ns & "_" & pd & release_type & "_" & VBA.Format(Now, "yyyymmdd") & ".xlsx"
@@ -106,7 +110,7 @@ Sub PPRpop()
      Application.ScreenUpdating = True
 
     MsgBox ("Completed generating PPRs! Close out of this file and open template or report.")
-
+    
 End Sub
 
 
@@ -177,3 +181,5 @@ Function Split97(sStr As Variant, sdelim As String) As Variant
     Split97 = Evaluate("{""" & _
     Application.Substitute(sStr, sdelim, """,""") & """}")
 End Function
+
+
