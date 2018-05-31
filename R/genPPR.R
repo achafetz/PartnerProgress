@@ -59,11 +59,11 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
       dplyr::mutate(disagg = ifelse(ismcad=="Y", paste(agecoarse, sex, sep="/"), "Total"),
-             currentsnuprioritization = ifelse(is.na(currentsnuprioritization),"[not classified]", currentsnuprioritization))
+                    snuprioritization = ifelse(is.na(snuprioritization),"[not classified]", snuprioritization))
 
   #aggregate by subset variable list
     df_ppr <- df_ppr %>%
-      dplyr::group_by(operatingunit, countryname, psnu, psnuuid, currentsnuprioritization,
+      dplyr::group_by(operatingunit, countryname, psnu, psnuuid, snuprioritization,
                 fundingagency, primepartner, mechanismid, implementingmechanismname,
                 indicator, disagg) %>%
       dplyr::summarize_at(dplyr::vars(dplyr::starts_with("fy")), ~ sum(., na.rm=TRUE)) %>%

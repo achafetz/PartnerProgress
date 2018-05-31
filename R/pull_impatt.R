@@ -17,13 +17,13 @@ pull_impatt <- function(folderpath){
   
   #TEMP, need updated dataset with actually names and fy18 data
     df <- df %>% 
-      dplyr::rename(currentsnuprioritization = fy18snuprioritization,
+      dplyr::rename(snuprioritization = fy18snuprioritization,
                     value = fy2017)
     
   #keep just POP and PLHIV
     df <- df %>% 
       dplyr::filter(indicator %in% c("POP_NUM", "PLHIV"), disaggregate == "Total Numerator") %>% 
-      dplyr::select(region, operatingunit, countryname, psnuuid, psnu, currentsnuprioritization, indicator, value) %>% 
+      dplyr::select(region, operatingunit, countryname, psnuuid, psnu, snuprioritization, indicator, value) %>% 
       dplyr::filter(value!=0, !is.na(value))
     
   #export
