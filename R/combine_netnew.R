@@ -52,10 +52,7 @@ combine_netnew <- function(df){
   #add dropped values back in and reoder to append onto original dataframe
     df_combo <- df_combo %>% 
       dplyr::mutate(dataelementuid = NA,
-                    categoryoptioncombouid = NA,
-                    fy2015q3 = NA,
-                    fy2016q1 = NA,
-                    fy2016q3 = NA) %>% 
+                    categoryoptioncombouid = NA) %>% 
       dplyr::select(msd_order)
     
   #append TX_NET_NEW onto main dataframe
