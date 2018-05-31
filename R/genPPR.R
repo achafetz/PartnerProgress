@@ -45,10 +45,10 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   	           toupper()
   
   #add MCAD variable for FY18 (only present prior to FY18)
-  	df_ppr <- add_mcad(df_ppr)
+  	df_ppr <- add_mcad(df_mer)
   	
   #subset to indicators of interest
-  	df_ppr <- filter_keyinds(df_mer, curr_q)
+  	df_ppr <- filter_keyinds(df_ppr, curr_q)
 
   #apply offical names before aggregating (since same mech id may have multiple partner/mech names)
   	df_ppr <- officialnames(df_ppr, here::here("RawData"))
