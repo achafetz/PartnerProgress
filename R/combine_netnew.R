@@ -82,7 +82,7 @@ gen_netnew <- function(df, type = "result"){
   #for results, only want to keep quarterly data; for targets, calc off targets and priod q4
     if(type == "result") {
       df_nn <- df %>% 
-        dplyr::select(-dplyr::ends_with("targets"), -fy2015q3, -fy2016q1, -fy2016q3)
+        dplyr::select(-dplyr::ends_with("targets"))
     } else {
       df_nn <- df %>% 
         dplyr::select(-dplyr::ends_with("q1"), -dplyr::ends_with("q2"), -dplyr::ends_with("q3")) 
