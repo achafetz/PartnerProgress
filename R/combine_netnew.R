@@ -46,16 +46,16 @@ combine_netnew <- function(df){
       tidyr::spread(pd, val)
     
   #join all net new pds/targets/apr together
-    df_combo <- dplyr::full_join(df_nn_result, df_nn_target)
-    df_combo <- dplyr::full_join(df_combo, df_nn_apr)
+    join_vars <- df %>% 
+      dplyr::select(-dataelementuid, -categoryoptioncombouid, -dplyr::starts_with("fy")) %>% 
+      names()
+    df_combo <- dplyr::full_join(df_nn_result, df_nn_target, by = join_vars)
+    df_combo <- dplyr::full_join(df_combo, df_nn_apr, by = join_vars)
   
   #add dropped values back in and reoder to append onto original dataframe
     df_combo <- df_combo %>% 
       dplyr::mutate(dataelementuid = NA,
-                    categoryoptioncombouid = NA,
-                    fy2015q3 = NA,
-                    fy2016q1 = NA,
-                    fy2016q3 = NA) %>% 
+                    categoryoptioncombouid = NA) %>% 
       dplyr::select(msd_order)
     
   #append TX_NET_NEW onto main dataframe
@@ -85,7 +85,7 @@ gen_netnew <- function(df, type = "result"){
   #for results, only want to keep quarterly data; for targets, calc off targets and priod q4
     if(type == "result") {
       df_nn <- df %>% 
-        dplyr::select(-dplyr::ends_with("targets"), -fy2015q3, -fy2016q1, -fy2016q3)
+        dplyr::select(-dplyr::ends_with("targets"))
     } else {
       df_nn <- df %>% 
         dplyr::select(-dplyr::ends_with("q1"), -dplyr::ends_with("q2"), -dplyr::ends_with("q3")) 

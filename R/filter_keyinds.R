@@ -58,7 +58,7 @@ filter_keyinds <- function(df, qtr){
   df_keyind <- df %>% 
     dplyr::filter(((indicator %in% ind_list) & standardizeddisaggregate=="Total Numerator") |
              ((standardizeddisaggregate %in% c("MostCompleteAgeDisagg", "Modality/MostCompleteAgeDisagg")) & 
-                indicator!="HTS_TST_NEG") & sex!="" & (age %in% c("<15", "15+"))) 
+                indicator!="HTS_TST_NEG") & sex!="" & (agecoarse %in% c("<15", "15+"))) 
   
     #dplyr::filter(otherdisaggregate!="Unknown Sex")
 }
