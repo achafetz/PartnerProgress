@@ -46,8 +46,8 @@ combine_netnew <- function(df){
       tidyr::spread(pd, val)
     
   #join all net new pds/targets/apr together
-    join_vars <- df_combo %>% 
-      dplyr::select(-dataelementuid, -categoryoptioncombouid, dplyr::starts_with("fy")) %>% 
+    join_vars <- df %>% 
+      dplyr::select(-dataelementuid, -categoryoptioncombouid, -dplyr::starts_with("fy")) %>% 
       names()
     df_combo <- dplyr::full_join(df_nn_result, df_nn_target, by = join_vars)
     df_combo <- dplyr::full_join(df_combo, df_nn_apr, by = join_vars)
