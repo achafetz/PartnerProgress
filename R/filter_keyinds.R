@@ -35,6 +35,7 @@ key_ind <- function(qtr){
 #' @param df dataframe to subset
 #' @param qtr current quarter
 #'
+#' @export
 #' @importFrom dplyr %>%
 #'
 #' @examples
@@ -62,4 +63,5 @@ filter_keyinds <- function(df, qtr){
     dplyr::filter(((indicator %in% ind_list) & standardizeddisaggregate=="Total Numerator") |
              ((standardizeddisaggregate %in% c("MostCompleteAgeDisagg", "Modality/MostCompleteAgeDisagg")) & 
                 indicator!="HTS_TST_NEG") & sex!="" & (agecoarse %in% c("<15", "15+")))
+  return(df_keyind)
 }

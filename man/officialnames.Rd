@@ -4,20 +4,15 @@
 \alias{officialnames}
 \title{Cleanup Mechanism and Partner Names to their Official Names}
 \usage{
-officialnames(df, report_folder_path, report_start_year = 2016)
+officialnames(df)
 }
 \arguments{
-\item{df}{identify the MER Structured data frame to clean}
-
-\item{report_folder_path}{file path to the parent folder?}
-
-\item{report_start_year}{what is the start year of the COP Matrix Report, default's to 2014}
+\item{df}{identify the MER Structured DataSet to clean}
 }
 \description{
-Some mechanisms and partners are recorded in FACTSInfo with multiple names over different time period. This function replaces all partner and mechanism names the most recent name for each mechanism ID from a FACTSInfo COP Matrix Report.
+Some mechanisms and partners are recorded in FACTSInfo with multiple names over different time period. This function replaces all partner and mechanism names the most recent name for each mechanism ID pulling from a DATIM SQL View.
 }
 \examples{
 \dontrun{
-clean up names
-df_psnu_im <- officialnames(df_psnu_im, "~/Documents/") }
+df_psnu_im <- officialnames(df_psnu_im) }
 }
