@@ -51,7 +51,7 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   	df_ppr <- filter_keyinds(df_ppr, curr_q)
 
   #apply offical names before aggregating (since same mech id may have multiple partner/mech names)
-  	df_ppr <- officialnames(df_ppr, here::here("RawData"))
+  	df_ppr <- officialnames(df_ppr)
   	
   #create net new and bind it on
   	df_ppr <- combine_netnew(df_ppr)
