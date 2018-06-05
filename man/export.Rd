@@ -4,7 +4,7 @@
 \alias{export}
 \title{Export as base dataset(s) for PPR template}
 \usage{
-export(df, opunit, savepd)
+export(df, opunit, savepd, folderpath_output)
 }
 \arguments{
 \item{df}{dataframe to export}

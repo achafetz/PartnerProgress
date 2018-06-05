@@ -11,6 +11,7 @@
 #' @param output_global export full dataset? logical, default = TRUE
 #' @param output_ctry_all export each country? logicial, default = TRUE
 #' @param df_return return a dataframe in R session, default = FALSE
+#' @param folderpath_output where do you want the output saved?, default = "ExcelOutput"
 #' @param output_subset_type select only subset, either "ou" or "mechid"
 #' @param ... add list of countries or mechanisms for `output_subset_type`, eg "18841", "14421"
 #'
@@ -28,12 +29,12 @@
 #' #export global and country specific files to populate PPR
 #'   genPPR("~/ICPI/Data")
 #' #export just Malawi and Kenya
-#'   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, output_subset_type = "ou", "Kenya", "Malawi")
+#'   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, folderpath_output = "ExcelOutput", output_subset_type = "ou", "Kenya", "Malawi")
 #' #export two mechanims
-#'   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, output_subset_type = "mechid", "18234", "18544") }
+#'   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, folderpath_output = "ExcelOutput", output_subset_type = "mechid", "18234", "18544") }
 #'
 
-genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, output_subset_type = NULL, ...){
+genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, folderpath_output = "ExcelOutput", output_subset_type = NULL, ...){
 
   #import/open data
   	df_mer <- readr::read_rds(Sys.glob(file.path(folderpath_msd, "ICPI_MER_Structured_Dataset_PSNU_IM_*.Rds")))
@@ -92,13 +93,13 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
 
   	#global
     if(output_global == TRUE){
-      export(df_ppr, "GLOBAL", fy_save)
+      export(df_ppr, "GLOBAL", fy_save, folderpath_output)
     }
 
   	#countries
     if(output_ctry_all == TRUE){
       ou_list <- unique(df_ppr$operatingunit)
-      purrr::map(.x = ou_list, .f = ~ export(df_ppr, .x, fy_save))
+      purrr::map(.x = ou_list, .f = ~ export(df_ppr, .x, fy_save, folderpath_output))
     }
 
   	#capture selection to filter df to
@@ -106,10 +107,10 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   	
   	#export selection
   	if(!is.null(output_subset_type) && output_subset_type == "ou"){
-  	  purrr::map(.x = group, .f = ~ export(df_ppr, .x, fy_save))
+  	  purrr::map(.x = group, .f = ~ export(df_ppr, .x, fy_save, folderpath_output))
   	} else if(!is.null(output_subset_type) && output_subset_type == "mechid"){
   	  dplyr::filter(df_ppr, mechanismid %in% c(!!!group)) %>%
-  	    export("GLOBAL_SelectMechs", fy_save)
+  	    export("GLOBAL_SelectMechs", fy_save, folderpath_output)
   	}
   
   	#output data frame
