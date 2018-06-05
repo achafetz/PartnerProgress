@@ -12,7 +12,7 @@
 #' \dontrun{
 #'  export(df_mer, "Kenya", "FY2018Q1") }
 #'  
-export <- function(df, opunit, savepd){
+export <- function(df, opunit, savepd, folderpath_output){
 
   print(paste("export dataset:", opunit))
   filename <- 
@@ -21,10 +21,10 @@ export <- function(df, opunit, savepd){
   if(stringr::str_detect(opunit, "GLOBAL") == FALSE) {
     df %>% 
       dplyr::filter(operatingunit == opunit) %>% 
-    readr::write_csv(here::here("ExcelOutput", filename), na = "")
+    readr::write_csv(file.path(folderpath_output, filename), na = "")
     invisible(df)
   } else {
-    readr::write_csv(df, here::here("ExcelOutput", filename), na = "")
+    readr::write_csv(df, file.path(folderpath_output, filename), na = "")
   }
     
 }

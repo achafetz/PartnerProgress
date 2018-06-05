@@ -5,7 +5,8 @@
 \title{Generate PPR export data file}
 \usage{
 genPPR(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
-  df_return = FALSE, output_subset_type = NULL, ...)
+  df_return = FALSE, folderpath_output = "ExcelOutput",
+  output_subset_type = NULL, ...)
 }
 \arguments{
 \item{folderpath_msd}{what is the folder path to the ICPI MER Structured dataset? eg "~/ICPI/Data"}
@@ -15,6 +16,8 @@ genPPR(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
 \item{output_ctry_all}{export each country? logicial, default = TRUE}
 
 \item{df_return}{return a dataframe in R session, default = FALSE}
+
+\item{folderpath_output}{where do you want the output saved?, default = "ExcelOutput"}
 
 \item{output_subset_type}{select only subset, either "ou" or "mechid"}
 
@@ -37,8 +40,8 @@ NOTES
 #export global and country specific files to populate PPR
   genPPR("~/ICPI/Data")
 #export just Malawi and Kenya
-  genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, output_subset_type = "ou", "Kenya", "Malawi")
+  genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, folderpath_output = "ExcelOutput", output_subset_type = "ou", "Kenya", "Malawi")
 #export two mechanims
-  genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, output_subset_type = "mechid", "18234", "18544") }
+  genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, folderpath_output = "ExcelOutput", output_subset_type = "mechid", "18234", "18544") }
 
 }
