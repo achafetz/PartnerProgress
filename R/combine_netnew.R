@@ -1,6 +1,6 @@
-#' Add net new to dataset
+#' Add NET_NEW to dataset
 #'
-#' @param df dataframe to create net new from and add it on
+#' @param df dataframe to create net new based off of and append onto
 #'
 #' @export
 #' 
@@ -13,8 +13,12 @@
 #' 
 combine_netnew <- function(df){
   
+  #store column names (to work for both lower case and camel case) & then covert to lowercase
+    headers_orig <- names(df)
+    df <- dplyr::rename_all(df, ~ tolower(.))
+    
   #save column names/order for binding at end
-  msd_order <- names(df)
+    msd_order <- names(df)
   
   #keep TX_CURR to create net_new off of  
     df_tx <- df %>% 
@@ -61,6 +65,10 @@ combine_netnew <- function(df){
   #append TX_NET_NEW onto main dataframe
     df <- dplyr::bind_rows(df, df_combo)
   
+  #reapply original variable casing type plus cumulative
+    headers_orig <- c(headers_orig, varname)
+    names(df) <- headers_orig
+    
   return(df)
   
 }
