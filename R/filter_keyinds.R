@@ -50,9 +50,7 @@ filter_keyinds <- function(df, qtr){
   df <- df %>% 
     dplyr::mutate(indicator = ifelse((indicator=="TB_ART" & standardizeddisaggregate=="Total Denominator"),"TB_ART_D",indicator),
                   indicator = ifelse((indicator=="TB_STAT" & standardizeddisaggregate=="Total Denominator"),"TB_STAT_D",indicator),
-                  standardizeddisaggregate = ifelse((indicator %in% c("TB_ART_D", "TB_STAT_D")),"Total Numerator",standardizeddisaggregate),
-                  #below should be a one time fix for FY18Q2i
-                  standardizeddisaggregate = ifelse((standardizeddisaggregate == "HIVStatus" & numeratordenom == "N"), "Total Numerator", standardizeddisaggregate)
+                  standardizeddisaggregate = ifelse((indicator %in% c("TB_ART_D", "TB_STAT_D")),"Total Numerator",standardizeddisaggregate)
                   )
   
   #indicators to keep (based on the current quarter)
