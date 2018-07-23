@@ -58,6 +58,7 @@ filter_keyinds <- function(df, qtr){
   
   #filter to select indicators (based on quarter)
   df_keyind <- df %>% 
-    dplyr::filter(indicator %in% ind_list & standardizeddisaggregate=="Total Numerator" | ismcad == "Y")
+    dplyr::filter(indicator %in% ind_list & (standardizeddisaggregate=="Total Numerator" | ismcad == "Y") & agecoarse != "Unknown Age")
+  
   return(df_keyind)
 }
