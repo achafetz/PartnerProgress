@@ -66,7 +66,7 @@ combine_netnew <- function(df){
     df <- dplyr::bind_rows(df, df_combo)
   
   #reapply original variable casing type plus cumulative
-    headers_orig <- c(headers_orig, varname)
+    #headers_orig <- c(headers_orig, varname)
     names(df) <- headers_orig
     
   return(df)
