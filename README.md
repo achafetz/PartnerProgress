@@ -1,5 +1,7 @@
 ## Partner Progress Report
 
+[![Build Status](https://travis-ci.org/achafetz/PartnerProgress.svg?branch=master)](https://travis-ci.org/achafetz/PartnerProgress)
+
 The package is used to create the data output that underlies the ICPI Partner Progress Reports (PPRs) which are generated twice a quarter (initial and post-cleaning). Historically, the data was [created in Stata](https://github.com/achafetz/PartnerProgress/tree/master/Archive_Stata) and required slight tweaks every quarter. Starting with FY18Q1, the scripts were converted into a automated package. The output is then used to populate an Excel template via [VBA](https://github.com/achafetz/PartnerProgress/tree/master/VBA) and the reports are then posted to [PEPFAR Sharepoint](https://www.pepfar.net/OGAC-HQ/icpi/Products/Forms/AllItems.aspx?RootFolder=%2FOGAC-HQ%2Ficpi%2FProducts%2FICPI%20Approved%20Tools%20%28Most%20Current%20Versions%29%2FPPR&FolderCTID=0x0120004DAC66286D0B8344836739DA850ACB95&View=%7B58E3102A-C027-4C66-A5C7-84FEBE208B3C%7D).
 
 ### Create the PPR dataset
