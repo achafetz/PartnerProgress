@@ -17,10 +17,9 @@ add_mcad <- function(df){
   
   #identify variables to drop (due to uniqueness) before aggregation which will be added back in at end for rbind
     vars_drop <- df_mcad %>% 
-      dplyr::select(c(disaggregate, categoryoptioncombouid, 
-                      categoryoptioncomboname, ageasentered, 
-                      agefine, agesemifine, coarsedisaggregate, 
-                      coarsedisaggregate),
+      dplyr::select(c(disaggregate, categoryoptioncomboname, 
+                      ageasentered, agefine, agesemifine,  
+                      coarsedisaggregate, coarsedisaggregate),
                     dplyr::starts_with("fy2017")) %>% 
       names()
  

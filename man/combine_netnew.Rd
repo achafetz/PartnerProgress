@@ -2,15 +2,15 @@
 % Please edit documentation in R/combine_netnew.R
 \name{combine_netnew}
 \alias{combine_netnew}
-\title{Add net new to dataset}
+\title{Add NET_NEW to dataset}
 \usage{
 combine_netnew(df)
 }
 \arguments{
-\item{df}{dataframe to create net new from and add it on}
+\item{df}{dataframe to create net new based off of and append onto}
 }
 \description{
-Add net new to dataset
+Add NET_NEW to dataset
 }
 \examples{
 \dontrun{

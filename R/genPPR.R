@@ -37,7 +37,7 @@
 genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, folderpath_output = "ExcelOutput", output_subset_type = NULL, ...){
 
   #import/open data
-  	df_mer <- readr::read_rds(Sys.glob(file.path(folderpath_msd, "ICPI_MER_Structured_Dataset_PSNU_IM_*.Rds")))
+  	df_mer <- readr::read_rds(Sys.glob(file.path(folderpath_msd, "MER_Structured_Dataset_PSNU_IM_*.Rds")))
 
   #find current quarter & fy
   	curr_q  <- currentpd(df_mer, "quarter")
@@ -55,12 +55,12 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   	df_ppr <- officialnames(df_ppr)
   	
   #create net new and bind it on
+  	df_ppr <- import_oldtx(df_ppr, folderpath_msd)
   	df_ppr <- combine_netnew(df_ppr)
 
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
-      dplyr::mutate(sex = ifelse(sex == "Unknown", "Unknown Sex", sex),
-                    sex = ifelse(agecoarse == "<15", stringr::str_replace(sex, "Female|Male", "Unknown Sex"), sex),
+      dplyr::mutate(sex = ifelse(agecoarse == "<15", stringr::str_replace(sex, "Female|Male", "Unknown Sex"), sex),
                     disagg = ifelse(ismcad=="Y", paste(agecoarse, sex, sep="/"), "Total"),
                     snuprioritization = ifelse(is.na(snuprioritization),"[not classified]", snuprioritization)) %>% 
       dplyr::filter(disagg != "15+/Unknown Sex") #only want Male/Female 15+
