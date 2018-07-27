@@ -4,10 +4,12 @@
 \alias{import_oldtx}
 \title{Import FY16Q4 data for TX_NET_NEW Calculation}
 \usage{
-import_oldtx(df, folderpath)
+import_oldtx(df, msd_type, folderpath)
 }
 \arguments{
 \item{df}{dataframe to add archived data onto}
+
+\item{msd_type}{what dataset is this? "OU_IM", "PSNU", or "PSNUxIM"}
 
 \item{folderpath}{}
 }

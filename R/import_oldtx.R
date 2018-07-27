@@ -2,17 +2,41 @@
 #' Import FY16Q4 data for TX_NET_NEW Calculation
 #'
 #' @param df dataframe to add archived data onto
+#' @param msd_type what dataset is this? "OU_IM", "PSNU", or "PSNUxIM"
 #' @param folderpath
 #'
 #' @export 
 #' @importFrom dplyr %>%
 
-import_oldtx <- function(df, folderpath){
+import_oldtx <- function(df, msd_type, folderpath){
   
-  #import Archived MSD for TX_NET_NEW Calculation (need FY16Q4 to calc NET NEW in FY17Q1)
-    df_tx_old <- readr::read_rds(file.path(folderpath,"ICPI_MER_Structured_Dataset_PSNU_IM_FY15-16_20180515_v1_1.Rds")) %>% 
-      dplyr::filter(indicator == "TX_CURR")
+  #check if archive rds/txt file exists
+    msdfile_rds <- Sys.glob(file.path(folderpath, paste0("*MER_Structured_Dataset_", msd_type, "_FY15-16*.Rds")))
+    msdfile_txt <- Sys.glob(file.path(folderpath, paste0("*MER_Structured_Dataset_", msd_type, "_FY15-16*.txt")))
+    if(length(msdfile_rds) == 0 && length(msdfile_txt) == 0){
+      stop("No archived file exists in specified folder to append onto current dataframe")
+    }
+  
+  #open rds/txt file  
+    if(length(msdfile_rds) == 1){
+      df_tx_old <- readr::read_rds(msdfile_rds) %>% 
+        dplyr::filter(indicator == "TX_CURR")
+    }
     
+    if(length(msdfile_rds) == 0 && length(msdfile_txt) == 1){
+      df_tx_old <- ICPIutilities::read_msd(msdfile_txt, save_rds = FALSE) %>% 
+        dplyr::filter(indicator == "TX_CURR")
+    }
+    
+  #store column names (to work for both lower case and camel case) & then covert to lowercase
+    headers_meta <- df %>% 
+      dplyr::select_if(is.character) %>%  
+      names()
+    header_vals <- df %>% 
+      dplyr::select_if(is.numeric) %>% 
+      names()
+    df <- dplyr::rename_all(df, ~ tolower(.))
+  
   #limit just to just meta data (string vars), excluding partner/mech and other UIDs that may lead to misalignment in merge
     lst_meta <- df_tx_old %>% 
       dplyr::select(-c(dataelementuid, categoryoptioncombouid)) %>% 
@@ -21,7 +45,7 @@ import_oldtx <- function(df, folderpath){
     df_tx_old <- dplyr::select(df_tx_old, lst_meta, fy2016q4)
     
   #rename offical
-    df_tx_old <- officialnames(df_tx_old)
+    df_tx_old <- ICPIutilities::rename_official(df_tx_old)
     
   #aggregate 
     df_tx_old <- df_tx_old %>% 
@@ -31,12 +55,22 @@ import_oldtx <- function(df, folderpath){
       dplyr::filter(fy2016q4 != 0)
     
   #join archive data onto current dataset
-    df_merge <- dplyr::full_join(df, df_tx_old)
+    df_merge <- dplyr::full_join(df, df_tx_old, by = lst_meta)
   
   #reorder so FY16Q4 comes before FY17
     lst_meta <- df_merge %>% 
       dplyr::select_if(is.character) %>% 
       names()
     df_merge <- dplyr::select(df_merge, lst_meta, fy2016q4, dplyr::everything())
+  
+  #reapply original variable casing
+    names(df_merge) <- c(headers_meta, "fy2016q4", header_vals)
+    
+  #change old q4 to upper case if necessary
+    if("FY2017Q4" %in% names(df_merge)){
+      df_merge <- dplyr::rename(df_merge, FY2017Q4 = fy2016q4)
+    }
+    
+  return(df_merge)
     
 }
