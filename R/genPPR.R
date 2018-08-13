@@ -8,6 +8,7 @@
 #'   - Report looks at only Totals and MCAD
 #'
 #' @param folderpath_msd what is the folder path to the ICPI MER Structured dataset? eg "~/ICPI/Data"
+#' @param archived_msd_folderpath if importing FY16Q4 data for NET_NEW, identify the folder path where archived file with FY15-16 data sits
 #' @param output_global export full dataset? logical, default = TRUE
 #' @param output_ctry_all export each country? logicial, default = TRUE
 #' @param df_return return a dataframe in R session, default = FALSE
@@ -34,7 +35,7 @@
 #'   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, folderpath_output = "ExcelOutput", output_subset_type = "mechid", "18234", "18544") }
 #'
 
-genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, folderpath_output = "ExcelOutput", output_subset_type = NULL, ...){
+genPPR <- function(folderpath_msd, archived_msd_folderpath = NULL, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, folderpath_output = "ExcelOutput", output_subset_type = NULL, ...){
 
   #import/open data
   	df_mer <- readr::read_rds(Sys.glob(file.path(folderpath_msd, "MER_Structured_Dataset_PSNU_IM_*.Rds")))
@@ -55,7 +56,7 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   	df_ppr <- ICPIutilities::rename_official(df_ppr)
   	
   #create net new and bind it on
-  	df_ppr <- combine_netnew(df_ppr, folderpath_msd)
+  	df_ppr <- combine_netnew(df_ppr, archived_msd_folderpath)
 
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
