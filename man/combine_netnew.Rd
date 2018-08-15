@@ -4,7 +4,7 @@
 \alias{combine_netnew}
 \title{Add NET_NEW to dataset}
 \usage{
-combine_netnew(df, archived_msd_filepath = NULL)
+combine_netnew(df, archived_msd_folderpath = NULL)
 }
 \arguments{
 \item{df}{dataframe to create net new based off of and append onto}
