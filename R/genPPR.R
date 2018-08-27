@@ -56,7 +56,7 @@ genPPR <- function(folderpath_msd, archived_msd_folderpath = NULL, output_global
   	df_ppr <- ICPIutilities::rename_official(df_ppr)
   	
   #create net new and bind it on
-  	df_ppr <- combine_netnew(df_ppr, archived_msd_folderpath)
+  	df_ppr <- ICPIutilities::combine_netnew(df_ppr, archived_msd_folderpath)
 
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
