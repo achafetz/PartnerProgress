@@ -56,7 +56,7 @@ genPPR <- function(folderpath_msd, archived_msd_folderpath = NULL, output_global
   	df_ppr <- ICPIutilities::rename_official(df_ppr)
   	
   #create net new and bind it on
-  	df_ppr <- combine_netnew(df_ppr, archived_msd_folderpath)
+  	df_ppr <- ICPIutilities::combine_netnew(df_ppr, archived_msd_folderpath)
 
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
@@ -74,7 +74,7 @@ genPPR <- function(folderpath_msd, archived_msd_folderpath = NULL, output_global
       dplyr::ungroup()
 
   #add cumulative value for fy
-  	df_ppr <- cumulative(df_ppr, curr_fy, curr_q)
+    df_ppr <- ICPIutilities::add_cumulative(df_ppr)
 
   #replace all 0's with NA
   	df_ppr[df_ppr==0] <- NA
