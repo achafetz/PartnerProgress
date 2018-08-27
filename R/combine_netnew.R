@@ -16,7 +16,7 @@ combine_netnew <- function(df, archived_msd_folderpath = NULL){
   
   #if merging in FY16Q4 data to ensure FY17cum TX_NET_NEW correctness
     if(!is.null(archived_msd_folderpath)){
-      df <- import_oldtx(df, archived_msd_folderpath)
+      df <- ICPIUtilities::import_oldtx(df, archived_msd_folderpath)
     }
   
   #store column names (to work for both lower case and camel case) & then covert to lowercase
