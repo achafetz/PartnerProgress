@@ -50,7 +50,6 @@ import_oldtx <- function(df, archived_msd_folderpath){
   
   #limit just to just meta data (string vars), excluding partner/mech and other UIDs that may lead to misalignment in merge
     lst_meta <- df_tx_old %>% 
-      dplyr::select(-c(dataelementuid, categoryoptioncombouid)) %>% 
       dplyr::select_if(is.character) %>% 
       names()
     df_tx_old <- dplyr::select(df_tx_old, lst_meta, fy2016q4)
