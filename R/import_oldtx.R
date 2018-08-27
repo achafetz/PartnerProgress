@@ -78,7 +78,7 @@ import_oldtx <- function(df, archived_msd_folderpath){
   
   #change old q4 to upper case if necessary
     if("FY2017Q4" %in% names(df)){
-      df_merge <- dplyr::rename(df_merge, FY2017Q4 = fy2016q4)
+      df_merge <- dplyr::rename(df_merge, FY2016Q4 = fy2016q4)
     }
     
   return(df_merge)
