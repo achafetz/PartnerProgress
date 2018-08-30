@@ -13,6 +13,7 @@
 *.rtf
 
 ReportTemplate/Archive/
+Documents/State of the Program/
 
 # Windows image file caches
 Thumbs.db
