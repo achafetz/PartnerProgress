@@ -51,7 +51,10 @@ genPPR <- function(folderpath_msd, archived_msd_folderpath = NULL, output_global
   	
   #subset to indicators of interest
   	df_ppr <- filter_keyinds(df_ppr, curr_q)
-
+  	
+  #adjust prioritizations to represent current year targeting
+  	df_ppr <- reprioritize(df_ppr)
+  	
   #apply offical names before aggregating (since same mech id may have multiple partner/mech names)
   	df_ppr <- ICPIutilities::rename_official(df_ppr)
   	
