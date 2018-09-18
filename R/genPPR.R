@@ -51,7 +51,10 @@ genPPR <- function(folderpath_msd, archived_msd_folderpath = NULL, output_global
   	
   #subset to indicators of interest
   	df_ppr <- filter_keyinds(df_ppr, curr_q)
-
+  	
+  #adjust prioritizations to represent current year targeting
+  	df_ppr <- reprioritize(df_ppr)
+  	
   #apply offical names before aggregating (since same mech id may have multiple partner/mech names)
   	df_ppr <- ICPIutilities::rename_official(df_ppr)
   	
@@ -83,11 +86,7 @@ genPPR <- function(folderpath_msd, archived_msd_folderpath = NULL, output_global
   	df_ppr <- limit(df_ppr, curr_fy)
   
   #drop missing rows
-  	df_ppr <- df_ppr %>%
-  	  tidyr::gather(period, value, dplyr::starts_with("fy"), na.rm = TRUE, factor_key = TRUE) %>%
-  	  dplyr::mutate(value = ifelse(value == 0, NA, value)) %>%
-  	  tidyr::drop_na(value) %>%
-  	  tidyr::spread(period, value)
+  	df_ppr <- dplyr::filter_if(df_ppr, is.numeric, dplyr::any_vars(!is.na(.) & . != 0))
   	
   #export datasets
 
