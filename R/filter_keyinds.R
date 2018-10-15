@@ -12,7 +12,7 @@
 key_ind <- function(qtr){
   #q1 (NET_NEW will be created, so not in list)
   ind <- c("HTS_TST", "TX_NEW", "PMTCT_EID", "HTS_TST_POS", "PMTCT_STAT", 
-           "PMTCT_STAT_POS", "TX_CURR", "PMTCT_ART", "VMMC_CIRC")
+           "PMTCT_STAT_POS", "TX_CURR", "PMTCT_ART", "VMMC_CIRC", "TX_NET_NEW")
   #q2 & q3
   if(qtr > 1) {
     ind <- c(ind, "KP_PREV", "PP_PREV", "OVC_HIVSTAT", "OVC_SERV", "TB_ART", 
