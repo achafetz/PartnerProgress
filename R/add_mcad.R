@@ -29,7 +29,7 @@ add_mcad <- function(df){
 
   #covert standard disaggs to match FY17 data to work over time and for aggregation
     df_mcad <- df_mcad %>% 
-      dplyr::mutate(standardizeddisaggregate = ifelse(indicator %in% c("TX_CURR", "TX_NEW"), 
+      dplyr::mutate(standardizeddisaggregate = ifelse(indicator %in% c("TX_CURR", "TX_NEW", "TX_NET_NEW"), 
                                                                 "MostCompleteAgeDisagg", 
                                                                 "Modality/MostCompleteAgeDisagg")) 
   #identify numeric variables to aggregate

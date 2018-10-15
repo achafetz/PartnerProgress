@@ -4,14 +4,12 @@
 \alias{genPPR}
 \title{Generate PPR export data file}
 \usage{
-genPPR(folderpath_msd, archived_msd_folderpath = NULL, output_global = TRUE,
-  output_ctry_all = TRUE, df_return = FALSE,
-  folderpath_output = "ExcelOutput", output_subset_type = NULL, ...)
+genPPR(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
+  df_return = FALSE, folderpath_output = "ExcelOutput",
+  output_subset_type = NULL, ...)
 }
 \arguments{
 \item{folderpath_msd}{what is the folder path to the ICPI MER Structured dataset? eg "~/ICPI/Data"}
-
-\item{archived_msd_folderpath}{if importing FY16Q4 data for NET_NEW, identify the folder path where archived file with FY15-16 data sits}
 
 \item{output_global}{export full dataset? logical, default = TRUE}
 

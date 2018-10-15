@@ -1,6 +1,6 @@
 Package: genPPR
 Title: PPR Dataset Generation
-Version: 1.0.7
+Version: 1.0.8
 Authors@R: person("Aaron", "Chafetz", email = "achafetz@usaid.gov", role = c("aut", "cre"))
 Description: Creates the country specific datasets used in the ICPI Partner Progress Reports (PPR)
 Depends: R (>= 3.4.3)
@@ -9,4 +9,4 @@ Imports: readxl, dplyr, tidyr, readr, magrittr, stringr, here
 Suggests: testthat
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
