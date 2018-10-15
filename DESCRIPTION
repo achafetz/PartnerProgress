@@ -9,4 +9,4 @@ Imports: readxl, dplyr, tidyr, readr, magrittr, stringr, here
 Suggests: testthat
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
