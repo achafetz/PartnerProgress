@@ -6,7 +6,8 @@
 #' @param projectname name of the project
 #' @param projectpath path to the folder where you want your project to sit
 #' @param ... subfolders to add in list, c("x", "y")
-#'
+#' 
+#' @export
 #' @examples
 #' \dontrun{
 #' initialize_fldr("NewProject", "~/GitHub", "RawData", "Documents", "R", "Output") }
