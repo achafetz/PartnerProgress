@@ -8,28 +8,42 @@ The package is used to create the data output that underlies the ICPI Partner Pr
 
 1) Install the package
 
-```
+```{r}
 #install
   install.packages("devtools")
-  library("devtools")
-  install_github("achafetz/PartnerProgress")
+  devtools::install_github("achafetz/PartnerProgress")
 #load package
   library("genPPR")
 ```
 
-2) Setup folder - Clone this repository to your local machine to have most of the folder structure and some data. Download the current ICPI MER Structured PSNUxIM dataset from the [Data Store on PEPFAR Sharepoint](https://www.pepfar.net/OGAC-HQ/icpi/Products/Forms/AllItems.aspx?RootFolder=%2FOGAC-HQ%2Ficpi%2FProducts%2FICPI%20Data%20Store%2FMER&FolderCTID=0x0120004DAC66286D0B8344836739DA850ACB95&View=%7B58E3102A-C027-4C66-A5C7-84FEBE208B3C%7D). You will need to convert it to an RDS file prior to running this package.
+2) Setup folder - [Clone this repository](https://github.com/achafetz/PartnerProgress/archive/master.zip) to your local machine to have most of the folder structure and some data. 
 
+```{r}
+#setup any missing folders
+  initialize_fldr(projectname = "PartnerProgress", #don't change this line
+                  projectpath"~/GitHub", #change to match where you want the project folder created locally
+                  "RawData", "Documents", "R", "ExcelOutput", "Reports") #don't change this line
 ```
-#convert Fact Viewv from .txt to .RDS
+
+3) Download the current ICPI MER Structured PSNUxIM dataset from the [Data Store on PEPFAR Sharepoint](https://www.pepfar.net/OGAC-HQ/icpi/Products/Forms/AllItems.aspx?RootFolder=%2FOGAC-HQ%2Ficpi%2FProducts%2FICPI%20Data%20Store%2FMER&FolderCTID=0x0120004DAC66286D0B8344836739DA850ACB95&View=%7B58E3102A-C027-4C66-A5C7-84FEBE208B3C%7D). You will need to convert it to an rds file prior to running this package. You can save the rds file in the `RawData` folder.
+
+```{r}
+#convert MSD from .txt to .rds
   devtools::install_github("ICPI/ICPIutilities")
   ICPIutilities::read_msd("~/Data/ICPI_MER_Structured_Dataset_OU_IM_FY17-18_20180515_v1_1")
-#setup any missing folders
-  initialize_fldr("PartnerProgress", "~/GitHub", "RawData", "Documents", "R", "ExcelOutput")
+```
+If you want to run this with an inprocess dataset from DATIM, you will need to [run the `match_msd()` function from `ICPIUtilities`](https://github.com/ICPI/ICPIutilities#match_msd) to have the correct file name and saved as an rds.
+
+```{r}
+#ALTERNATIVE: IF USING IN PROCESS DATA FROM DATIM
+  devtools::install_github("ICPI/ICPIutilities")
+  ICPIutilities::match_msd("~/Downloads/PEPFAR-Data-Genie-OUByIMs-2018-11-13.zip")
+PEPFAR-Data-Genie-OUByIMs-2018-11-13
 ```
 
-3) Create the PPR dataset - run the main script, `genPPR()` from the package to create the underlying dataset that feeds into the template
+4) Create the PPR dataset - run the main script, `genPPR()` from the package to create the underlying dataset that feeds into the template
 
-```
+```{r}
 #create global and OU output
   genPPR("~/ICPI/Data", folderpath_output = "~/Reports")
   
