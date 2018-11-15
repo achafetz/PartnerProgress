@@ -45,14 +45,14 @@ PEPFAR-Data-Genie-OUByIMs-2018-11-13
 
 ```{r}
 #create global and OU output
-  genPPR("~/ICPI/Data", folderpath_output = "~/Reports")
+  genPPR("~/ICPI/Data", folderpath_output = "~/ExcelOutput")
   
 #alternatively, you can just create a specific OU output
   genPPR("~/ICPI/Data", 
          output_global = FALSE, 
          output_ctry_all = FALSE, 
          df_return = FALSE, 
-         folderpath_output = "~/Reports",
+         folderpath_output = "~/ExcelOutput",
          output_subset_type = "ou", 
            "Kenya")
 
@@ -61,12 +61,12 @@ PEPFAR-Data-Genie-OUByIMs-2018-11-13
          output_global = FALSE, 
          output_ctry_all = FALSE, 
          df_return = FALSE, 
-         folderpath_output = "~/Reports", 
+         folderpath_output = "~/ExcelOutput", 
          output_subset_type = "mechid", 
            c("18045", "17097")
        )
 #or just the global output
-  genPPR("~/ICPI/Data", output_ctry_all = FALSE, folderpath_output = "~/Reports",)
+  genPPR("~/ICPI/Data", output_ctry_all = FALSE, folderpath_output = "~/ExcelOutput",)
 ```
 
 ===
