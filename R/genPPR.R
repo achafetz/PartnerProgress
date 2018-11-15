@@ -56,7 +56,10 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   	
   #apply offical names before aggregating (since same mech id may have multiple partner/mech names)
   	df_ppr <- ICPIutilities::rename_official(df_ppr)
-
+  
+  #include Net New targets (no included in DATIM since not set by countries)
+  	df_ppr <- include_nn_targets(df_ppr)
+  	
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
       dplyr::mutate(sex = ifelse(agecoarse == "<15", stringr::str_replace(sex, "Female|Male", "Unknown Sex"), sex),
