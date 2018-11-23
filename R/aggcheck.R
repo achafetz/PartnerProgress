@@ -15,24 +15,37 @@
 #'
 pprcheck <- function(filepath_fv, opunit){
 
-  here::here()
-
   df_check <- readr::read_rds(filepath_fv) %>%
     dplyr::filter(operatingunit == opunit)
 
-  pd <- currentpd(df_check, "full")
+  pd <- ICPIutilities::identifypd(df_check, "full")
   ind <-
-    currentpd(df_check, "quarter") %>%
+    ICPIutilities::identifypd(df_check, "quarter") %>%
     key_ind(.)
+  
+  
+  #calculate achievement
+  df_agg <- dplyr::mutate_(df, .dots = setNames(fcn, var_name))
+  
+  #setup for select and calculating achievement with mutate_
+  fy <- ICPIutilities::identifypd(df_check, "year")
+  prior_apr <- paste0("fy", fy - 1, "apr")
+  curr_cum <- paste0("fy", fy, "cum")
+  curr_targets <- ICPIutilities::identifypd(df_check, "target")
+  var_name <- paste0("fy", fy, "ach")
+  fcn <- paste0("round(", curr_cum, "/", curr_targets, ", 2)")
 
-  df_check %>%
-    dplyr::filter(indicator %in% ind, standardizeddisaggregate %in% c("Total Numerator","MostCompleteAgeDisagg", "Modality/MostCompleteAgeDisagg")) %>%
-    dplyr::group_by(indicator, standardizeddisaggregate, age, sex) %>%
-    dplyr::summarise(!!pd := sum(!!pd, na.rm = TRUE)) %>%
-    dplyr::ungroup() %>%
-    dplyr::arrange(indicator) %>%
-    tidyr::unite(disagg, age, sex, sep = "/") %>%
-    dplyr::mutate(disagg = ifelse(stringr::str_detect(disagg, "NA"), "Total", disagg)) %>%
-    dplyr::filter(fy2018q1!=0, !is.na(disagg), !stringr::str_detect(disagg, "Unknown Age")) %>%
+  df_check %>% 
+    dplyr::filter(indicator %in% ind, 
+                  standardizeddisaggregate %in% c("Total Numerator", "Total Denominator")) %>% 
+    ICPIutilities::add_cumulative() %>% 
+    dplyr::group_by(fundingagency, indicator, numeratordenom) %>% 
+    dplyr::summarize_at(dplyr::vars(prior_apr, curr_cum, curr_target), sum, na.rm = TRUE) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::mutate(indicator = ifelse(numeratordenom == "D", paste0(indicator, "_D"), indicator)) %>% 
+    dplyr::select(-numeratordenom) %>% 
+    dplyr::mutate_(df, .dots = setNames(fcn, var_name)) %>% 
+    dplyr::filter(is.finite(fy2018ach)) %>% 
+    dplyr::arrange(indicator, fy2018ach) %>% 
     knitr::kable(format.args = list(big.mark = ",", zero.print = FALSE))
 }
