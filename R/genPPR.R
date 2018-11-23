@@ -56,11 +56,14 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   	
   #apply offical names before aggregating (since same mech id may have multiple partner/mech names)
   	df_ppr <- ICPIutilities::rename_official(df_ppr)
-
+  
+  #include Net New targets (no included in DATIM since not set by countries)
+  	df_ppr <- include_nn_targets(df_ppr)
+  	
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
       dplyr::mutate(sex = ifelse(agecoarse == "<15", stringr::str_replace(sex, "Female|Male", "Unknown Sex"), sex),
-                    disagg = ifelse(ismcad=="Y", paste(agecoarse, sex, sep="/"), "Total"),
+                    disagg = ifelse(agecoarse %in% c("<15", "15+"), paste(agecoarse, sex, sep="/"), "Total"),
                     snuprioritization = ifelse((is.na(snuprioritization) | snuprioritization == "~"),"[not classified]", snuprioritization)) %>% 
       dplyr::filter(disagg != "15+/Unknown Sex") #only want Male/Female 15+
 
@@ -74,6 +77,11 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
 
   #add cumulative value for fy
     df_ppr <- ICPIutilities::add_cumulative(df_ppr)
+  
+  #TB_ART FIX FOR FY18Q4i
+    df_ppr <- df_ppr %>% 
+      dplyr::mutate(fy2017apr = ifelse((indicator %in% c("TB_ART", "TB_ART_D")), fy2017q2 + fy2017q4, fy2017apr),
+                    fy2018cum = ifelse((indicator %in% c("TB_ART", "TB_ART_D")), fy2018q2 + fy2018q4, fy2018cum))
 
   #replace all 0's with NA
   	df_ppr[df_ppr==0] <- NA
