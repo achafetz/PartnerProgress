@@ -81,7 +81,6 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   #TB_ART FIX FOR FY18Q4i
     df_ppr <- df_ppr %>% 
       dplyr::mutate(fy2017apr = ifelse((indicator %in% c("TB_ART", "TB_ART_D")), fy2017q2 + fy2017q4, fy2017apr),
-                    fy2018apr = ifelse((indicator %in% c("TB_ART", "TB_ART_D")), fy2018q2 + fy2018q4, fy2018apr),
                     fy2018cum = ifelse((indicator %in% c("TB_ART", "TB_ART_D")), fy2018q2 + fy2018q4, fy2018cum))
 
   #replace all 0's with NA
