@@ -27,5 +27,5 @@ pull_impatt <- function(folderpath){
       dplyr::filter(value!=0, !is.na(value))
     
   #export
-    readr::write_csv(df, here::here("ExcelOutput", "PPRdata_impatt.csv"), na = "")
+    readr::write_csv(df, "ExcelOutput/PPRdata_impatt.csv", na = "")
 }
