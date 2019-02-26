@@ -37,7 +37,7 @@
 genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, folderpath_output = "ExcelOutput", output_subset_type = NULL, ...){
 
   #import/open data
-  	df_mer <- readr::read_rds(Sys.glob(file.path(folderpath_msd, "MER_Structured_Dataset_PSNU_IM_FY17-18*.rds")))
+  	df_mer <- readr::read_rds(Sys.glob(file.path(folderpath_msd, "MER_Structured_Dataset_PSNU_IM_FY17-19*.rds")))
 
   #find current quarter & fy
   	curr_q  <- currentpd(df_mer, "quarter")
