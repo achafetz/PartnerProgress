@@ -3,7 +3,7 @@
 ^\.Rproj\.user$
 ^\.travis\.yml$
 ^data-raw$
-^Archived_Stata$
+^Archive_Stata$
 ^Documents$
 ^ExcelOutput$
 ^RawData$
