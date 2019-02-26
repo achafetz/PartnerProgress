@@ -4,7 +4,7 @@ Version: 1.0.10
 Authors@R: person("Aaron", "Chafetz", email = "achafetz@usaid.gov", role = c("aut", "cre"))
 Description: Creates the country specific datasets used in the ICPI Partner Progress Reports (PPR)
 Depends: R (>= 3.4.3)
-License: CC-BY-SA-4.0
+License: MIT + file LICENSE
 Imports: readxl, dplyr, tidyr, readr, magrittr, stringr, here
 Remotes: ICPI/ICPIutilities
 Suggests: testthat
