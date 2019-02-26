@@ -57,14 +57,20 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   #apply offical names before aggregating (since same mech id may have multiple partner/mech names)
   	df_ppr <- ICPIutilities::rename_official(df_ppr)
   
-  #include Net New targets (no included in DATIM since not set by countries)
+  #include Net New targets (not included in DATIM)
   	df_ppr <- include_nn_targets(df_ppr)
   	
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
-      dplyr::mutate(sex = ifelse(agecoarse == "<15", stringr::str_replace(sex, "Female|Male", "Unknown Sex"), sex),
-                    disagg = ifelse(agecoarse %in% c("<15", "15+"), paste(agecoarse, sex, sep="/"), "Total"),
-                    snuprioritization = ifelse((is.na(snuprioritization) | snuprioritization == "~"),"[not classified]", snuprioritization)) %>% 
+      dplyr::mutate(sex = ifelse(agecoarse == "<15", 
+                                 stringr::str_replace(sex, "Female|Male", "Unknown Sex"), 
+                                 sex),
+                    disagg = ifelse(agecoarse %in% c("<15", "15+"), 
+                                    paste(agecoarse, sex, sep="/"), 
+                                    "Total"),
+                    snuprioritization = ifelse(snuprioritization %in% c("~", NA),
+                                               "[not classified]", 
+                                               snuprioritization)) %>% 
       dplyr::filter(disagg != "15+/Unknown Sex") #only want Male/Female 15+
 
   #aggregate by subset variable list
