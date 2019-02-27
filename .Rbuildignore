@@ -1,2 +1,12 @@
+^LICENSE\.md$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.travis\.yml$
+^data-raw$
+^Archive_Stata$
+^Documents$
+^ExcelOutput$
+^RawData$
+^Reports$
+^ReportTemplate$
+^VBA$
