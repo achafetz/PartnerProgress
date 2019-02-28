@@ -2,6 +2,7 @@
 
 export("%>%")
 export(add_mcad)
+export(add_pos)
 export(combine_netnew)
 export(cumulative)
 export(currentpd)
