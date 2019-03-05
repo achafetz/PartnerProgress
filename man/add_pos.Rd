@@ -2,17 +2,17 @@
 % Please edit documentation in R/add_pos.R
 \name{add_pos}
 \alias{add_pos}
-\title{Add missing PMTCT_STAT_POS or TB_STAT_POS}
+\title{Add missing HTS_TST_POS, PMTCT_STAT_POS, or TB_STAT_POS}
 \usage{
 add_pos(df, ind, pd = fy2019_targets)
 }
 \arguments{
 \item{df}{dataframe with missing _POS}
 
-\item{ind}{indicator, PMTCT_STAT or TB_STAT}
+\item{ind}{indicator: HTS_TST, PMTCT_STAT, or TB_STAT}
 
 \item{pd}{period to add _POS to}
 }
 \description{
-Add missing PMTCT_STAT_POS or TB_STAT_POS
+Add missing HTS_TST_POS, PMTCT_STAT_POS, or TB_STAT_POS
 }

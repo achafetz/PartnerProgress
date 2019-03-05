@@ -49,7 +49,7 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   	if (fy_save == "FY2019Q1"){
   	  df_mer <- df_mer %>% 
   	    add_pos("PMTCT_STAT") %>% 
-  	    add_pos("TB_STAT")
+  	    add_pos("HTS_TST")
   	}
   	
   #add MCAD variable for FY18 (only present prior to FY18)

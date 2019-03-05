@@ -1,7 +1,7 @@
-#' Add missing PMTCT_STAT_POS or TB_STAT_POS
+#' Add missing HTS_TST_POS, PMTCT_STAT_POS, or TB_STAT_POS
 #'
 #' @param df dataframe with missing _POS
-#' @param ind indicator, PMTCT_STAT or TB_STAT
+#' @param ind indicator: HTS_TST, PMTCT_STAT, or TB_STAT
 #' @param pd period to add _POS to
 #'
 #' @export
@@ -14,6 +14,8 @@ add_pos <- function(df, ind, pd = fy2019_targets){
   
   #identify the disagg to keep based on the indicator supplied
   disagg <- dplyr::case_when(ind == "PMTCT_STAT" ~ "Age/Sex/KnownNewResult",
+                             ind == "HTS_TST" ~ c("Modality/Age/Sex/Result",
+                                                  "Modality/Age Aggregated/Sex/Result"),
                              ind == "TB_STAT" ~ c("Age Aggregated/Sex/KnownNewPosNeg",
                                                   "Age/Sex/KnownNewPosNeg"))
   #name of the _POS indicator
@@ -34,16 +36,21 @@ add_pos <- function(df, ind, pd = fy2019_targets){
   
   #create a total numerator from the above
   df_pos_tn <- df_pos %>% 
+    dplyr::mutate(standardizeddisaggregate = "Total Numerator") %>% 
     dplyr::group_by(operatingunit, countryname, psnu, psnuuid, snuprioritization,
                     fundingagency, primepartner, mechanismid, implementingmechanismname,
                     indicator, standardizeddisaggregate) %>% 
     dplyr::summarise_at(dplyr::vars(!!pd), sum, na.rm = TRUE) %>% 
-    dplyr::ungroup() %>% 
-    dplyr::mutate(standardizeddisaggregate = "Total Numerator",
-                  disaggregate = "Total Numerator")
+    dplyr::ungroup()
   
   #bind numerator and disagg onto main data frame 
-  df <- dplyr::bind_rows(df, df_pos_tn, df_pos)
+  if(ind == "HTS_TST")
+    df <- dplyr::mutate(df, fy2019_targets = ifelse(indicator == "HTS_TST_POS" & standardizeddisaggregate == "Total Numerator", NA, fy2019_targets))
+  
+  df <- dplyr::bind_rows(df, df_pos_tn)
+  
+  if(ind != "HTS_TST")
+    df <- dplyr::bind_rows(df, df_pos)
   
   return(df)
 }
