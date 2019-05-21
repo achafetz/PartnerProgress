@@ -39,6 +39,9 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   #import/open data
   	df_mer <- readr::read_rds(Sys.glob(file.path(folderpath_msd, "MER_Structured_Dataset_PSNU_IM_FY17-19*.rds")))
 
+  #reshape wide to match old MSD
+  	df_mer <- ICPIutilities::reshape_msd(df_mer, "wide")
+  	
   #find current quarter & fy
   	curr_q  <- currentpd(df_mer, "quarter")
   	curr_fy <- currentpd(df_mer, "year")
