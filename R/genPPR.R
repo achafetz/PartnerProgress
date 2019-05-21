@@ -48,9 +48,6 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   	fy_save <- currentpd(df_mer, "full") %>%
   	           toupper()
   	
-  #add MCAD variable for FY18 (only present prior to FY18)
-  	df_ppr <- add_mcad(df_mer)
-  	
   #subset to indicators of interest
   	df_ppr <- filter_keyinds(df_ppr, curr_q)
   	
