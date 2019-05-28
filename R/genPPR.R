@@ -49,9 +49,6 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   	           toupper()
   	
   #subset to indicators of interest
-  	#fix misspelling in FY19Q1i
-  	if("standardiddisaggregate" %in% names(df_mer)) 
-  	  df_mer <- dplyr::rename(df_mer, standardizeddisaggregate = standardiddisaggregate)
   	df_ppr <- filter_keyinds(df_mer, curr_q)
   	
   #adjust prioritizations to represent current year targeting
