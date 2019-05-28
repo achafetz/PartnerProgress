@@ -62,11 +62,10 @@ filter_keyinds <- function(df, qtr){
   
   #filter a secondary df that contains age/sex disaggs for select in available quarterly
   df_keyind_disaggs <- df %>% 
-    dplyr::filter(dplyr::filter(indicator %in% c("HTS_TST", "HTS_TST_POS", "TX_NEW", "TX_CURR", "TX_NET_NEW"),
-                                stringr::str_detect(standardizeddisaggregate, "Sex"),
-                                sex!="",
-                                trendscoarse %in% c("<15", "15+")))
-  
+    dplyr::filter(indicator %in% c("HTS_TST", "HTS_TST_POS", "TX_NEW", "TX_CURR", "TX_NET_NEW"),
+                  stringr::str_detect(standardizeddisaggregate, "Sex"),
+                  sex!="",
+                  trendscoarse %in% c("<15", "15+"))
   #join
   df_keyind <- dplyr::bind_rows(df_keyind,df_keyind_disaggs)
   
