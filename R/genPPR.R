@@ -62,11 +62,11 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   	
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
-      dplyr::mutate(sex = ifelse(agecoarse == "<15", 
+      dplyr::mutate(sex = ifelse(trendscoarse == "<15", 
                                  stringr::str_replace(sex, "Female|Male", "Unknown Sex"), 
                                  sex),
-                    disagg = ifelse(agecoarse %in% c("<15", "15+"), 
-                                    paste(agecoarse, sex, sep="/"), 
+                    disagg = ifelse(trendscoarse %in% c("<15", "15+"), 
+                                    paste(trendscoarse, sex, sep="/"), 
                                     "Total"),
                     snuprioritization = ifelse(snuprioritization %in% c("~", NA),
                                                "[not classified]", 
