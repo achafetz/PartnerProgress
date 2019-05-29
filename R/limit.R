@@ -1,7 +1,7 @@
 
 #' Limit 
 #'
-#' @description Velcro identifies generic variable columns - last 6 pds, prior APR value, current cumulative 
+#' @description Velcro identifies generic variable columns - last 6 pds, prior cumulative value, current cumulative 
 #'   value, and current FY targets - and then limits output dataset to 
 #' 
 #' @param df data frame to apply
@@ -32,10 +32,10 @@ limit <- function(df, fy){
     col_fytarget_curr <- paste0("fy", fy, "_targets")
     
   #identify and store last year's apr value
-    col_fycum_lag.1 <- paste0("fy", fy - 1, "apr")
+    col_fycum_lag.1 <- paste0("fy", fy - 1, "cumulative")
   
   #identify and store this year's cum value
-    col_fycum_curr <- paste0("fy", fy, "cum")
+    col_fycum_curr <- paste0("fy", fy, "cumulative")
   
   #list of values to keep and order
     tokeep_order <- c(col_str, col_pds, col_fycum_lag.1, col_fycum_curr, col_fytarget_curr)
@@ -43,5 +43,7 @@ limit <- function(df, fy){
   #keep just selected value columns  
   df <- df %>% 
     dplyr::select(tokeep_order)
+  
+  return(df)
 }
 
