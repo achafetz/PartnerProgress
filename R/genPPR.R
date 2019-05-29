@@ -80,9 +80,6 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
                 indicator, disagg) %>%
       dplyr::summarize_at(dplyr::vars(dplyr::starts_with("fy")), ~ sum(., na.rm=TRUE)) %>%
       dplyr::ungroup()
-
-  #add cumulative value for fy
-    df_ppr <- ICPIutilities::add_cumulative(df_ppr)
   
   #replace all 0's with NA
   	df_ppr[df_ppr==0] <- NA
