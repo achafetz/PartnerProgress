@@ -10,9 +10,9 @@
 include_nn_targets <- function(df){
   
   #identify current targets and prior q4 for calculation
-    curr_trgt <- ICPIutilities::identifypd(df, pd_type = "target")
-    prior_fy <- ICPIutilities::identifypd(df, pd_type = "year", pd_prior = TRUE)
-    prior_q4 <- paste0("fy", prior_fy, "q4")
+    curr_trgt <- ICPIutilities::identifypd(df, pd_type = "target") %>% dplyr::sym()
+    prior_fy <- ICPIutilities::identifypd(df, pd_type = "year", pd_prior = TRUE) 
+    prior_q4 <- paste0("fy", prior_fy, "q4") %>% dplyr::sym()
   
   #identify all character columns to keep  
     meta <- df %>% 
