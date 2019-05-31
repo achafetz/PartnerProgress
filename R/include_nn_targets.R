@@ -14,6 +14,13 @@ include_nn_targets <- function(df){
     prior_fy <- ICPIutilities::identifypd(df, pd_type = "year", pd_prior = TRUE) 
     prior_q4 <- paste0("fy", prior_fy, "q4") %>% dplyr::sym()
   
+  #adjust for under 15 sex being unknown before FY19Q1
+    df <- dplyr::mutate(df, sex = ifelse(trendscoarse == "<15", 
+                                     stringr::str_replace(sex, "Female|Male", "Unknown Sex"), 
+                                     sex))
+  #remove for grouping by coarse age
+    df <- dplyr::select(df,-c(categoryoptioncomboname, ageasentered, trendsfine, trendssemifine))
+  
   #aggregate first so all mech values will be on same line
     df_agg <- df %>% 
       #filter for TX_CURR (NN_Target = TX_CURR_Target - TX_CURR_PRIOR_APR)
