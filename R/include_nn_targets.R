@@ -14,21 +14,14 @@ include_nn_targets <- function(df){
     prior_fy <- ICPIutilities::identifypd(df, pd_type = "year", pd_prior = TRUE) 
     prior_q4 <- paste0("fy", prior_fy, "q4") %>% dplyr::sym()
   
-  #identify all character columns to keep  
-    meta <- df %>% 
-      dplyr::select_if(is.character) %>% 
-      names() 
-    
   #aggregate first so all mech values will be on same line
     df_agg <- df %>% 
       #filter for TX_CURR (NN_Target = TX_CURR_Target - TX_CURR_PRIOR_APR)
       dplyr::filter(indicator == "TX_CURR") %>% 
-      #limit to all character cols and cols for calulation 
-      dplyr::select_at(dplyr::vars(meta, prior_q4, curr_trgt)) %>%
       #aggregate
       dplyr::group_by_if(is.character) %>% 
-      dplyr::summarise_if(is.numeric, sum, na.rm = TRUE) %>%
-      dplyr::ungroup() 
+      dplyr::summarise_at(vars(!!prior_q4, !!curr_trgt), sum, na.rm = TRUE) %>%
+      dplyr::ungroup()  
   
   #setup formula and name for calculating with mutate_
     var_name <- curr_trgt
