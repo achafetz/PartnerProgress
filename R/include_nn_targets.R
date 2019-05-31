@@ -30,16 +30,15 @@ include_nn_targets <- function(df){
       dplyr::summarise_at(vars(!!prior_q4, !!curr_trgt), sum, na.rm = TRUE) %>%
       dplyr::ungroup()  
   
-  #setup formula and name for calculating with mutate_
-    var_name <- curr_trgt
-    fcn <- paste0(curr_trgt, "-", prior_q4)
+  #setup formula and name for calculating with mutate
+    var_name <- dplyr::enquo(curr_trgt)
     
   #gen net new target for all mechanisms 
     df_nn <- df_agg %>%
       #rename indicator TX_NET_NEW
       dplyr::mutate(indicator = "TX_NET_NEW") %>%
       #apply function from above
-      dplyr::mutate_(.dots = setNames(fcn, var_name)) %>%
+      dplyr::mutate(!!var_name := !!curr_trgt - !!prior_q4) %>%
       #filter out any targets of 0 to save space
       dplyr::filter_if(is.numeric, dplyr::any_vars(.!= 0)) %>% 
       #remove prior APR
