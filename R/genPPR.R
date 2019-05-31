@@ -2,12 +2,11 @@
 #'
 #' Purpose: generate output for Excel monitoring dashboard
 #' NOTES
-#'   - Data source: ICPI_MER_Structured_Dataset_PSNU_IM  [ICPI Data Store]
-#'   - Need current COP Matrix report (renaming to official names)
+#'   - Data source: MER Structured Dataset PSNUxIM  [ICPI Data Store]
 #'   - Report aggregates DSD and TA
-#'   - Report looks at only Totals and MCAD
+#'   - Report looks at only Totals and coarse age (<15/15+) for testing and treatment
 #'
-#' @param folderpath_msd what is the folder path to the ICPI MER Structured dataset? eg "~/ICPI/Data"
+#' @param filepath_msd what is the file path to the MER Structured dataset? eg "~/ICPI/Data/MER_Structured_Dataset_OU_IM_FY17-19_20190517_v1_1.rds"
 #' @param output_global export full dataset? logical, default = TRUE
 #' @param output_ctry_all export each country? logicial, default = TRUE
 #' @param df_return return a dataframe in R session, default = FALSE
@@ -23,21 +22,24 @@
 #' @examples
 #' \dontrun{
 #' #export global file
-#'   genPPR("~/ICPI/Data", output_ctry_all = FALSE)
+#'   genPPR("~/ICPI/Data/MER_Structured_Dataset_OU_IM_FY17-19_20190517_v1_1.rds", output_ctry_all = FALSE)
 #' #view global file
-#'   df_ppr <- genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE)
+#'   df_ppr <- genPPR("~/ICPI/Data/MER_Structured_Dataset_OU_IM_FY17-19_20190517_v1_1.rds", output_global = FALSE, output_ctry_all = FALSE)
 #' #export global and country specific files to populate PPR
-#'   genPPR("~/ICPI/Data")
+#'   genPPR("~/ICPI/Data/MER_Structured_Dataset_OU_IM_FY17-19_20190517_v1_1.rds")
 #' #export just Malawi and Kenya
-#'   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, folderpath_output = "ExcelOutput", output_subset_type = "ou", "Kenya", "Malawi")
+#'   genPPR("~/ICPI/Data/MER_Structured_Dataset_OU_IM_FY17-19_20190517_v1_1.rds", output_global = FALSE, output_ctry_all = FALSE, folderpath_output = "ExcelOutput", output_subset_type = "ou", "Kenya", "Malawi")
 #' #export two mechanims
-#'   genPPR("~/ICPI/Data", output_global = FALSE, output_ctry_all = FALSE, folderpath_output = "ExcelOutput", output_subset_type = "mechid", "18234", "18544") }
+#'   genPPR("~/ICPI/Data/MER_Structured_Dataset_OU_IM_FY17-19_20190517_v1_1.rds", output_global = FALSE, output_ctry_all = FALSE, folderpath_output = "ExcelOutput", output_subset_type = "mechid", "18234", "18544") }
 #'
 
-genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, folderpath_output = "ExcelOutput", output_subset_type = NULL, ...){
+genPPR <- function(filepath_msd, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, folderpath_output = "ExcelOutput", output_subset_type = NULL, ...){
 
+  if(tools::file_ext(filepath_msd) != "rds")
+    stop("File must be a rds file. From the ICPI/ICPIutilities repo, run read_msd()")
+  
   #import/open data
-  	df_mer <- readr::read_rds(Sys.glob(file.path(folderpath_msd, "MER_Structured_Dataset_PSNU_IM_FY17-19*.rds")))
+  	df_mer <- readr::read_rds(filepath_msd)
 
   #reshape wide to match old MSD
   	df_mer <- ICPIutilities::reshape_msd(df_mer, "wide")
@@ -91,7 +93,10 @@ genPPR <- function(folderpath_msd, output_global = TRUE, output_ctry_all = TRUE,
   	df_ppr <- dplyr::filter_if(df_ppr, is.numeric, dplyr::any_vars(!is.na(.) & . != 0))
   	
   #export datasets
-
+    #change directory if the directory does not exist
+  	if(!dir.exists(folderpath_output))
+  	  folderpath_output <- dirname(filepath_msd)
+  	
   	#global
     if(output_global == TRUE){
       export(df_ppr, "GLOBAL", fy_save, folderpath_output)
