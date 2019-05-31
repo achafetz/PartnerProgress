@@ -12,7 +12,7 @@ limit(df, fy)
 \item{fy}{current fy, eg 2018}
 }
 \description{
-Velcro identifies generic variable columns - last 6 pds, prior APR value, current cumulative 
+Limit identifies generic variable columns - last 6 pds, prior cumulative value, current cumulative 
   value, and current FY targets - and then limits output dataset to
 }
 \examples{

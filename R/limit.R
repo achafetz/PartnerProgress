@@ -1,7 +1,7 @@
 
 #' Limit 
 #'
-#' @description Velcro identifies generic variable columns - last 6 pds, prior cumulative value, current cumulative 
+#' @description Limit identifies generic variable columns - last 6 pds, prior cumulative value, current cumulative 
 #'   value, and current FY targets - and then limits output dataset to 
 #' 
 #' @param df data frame to apply
