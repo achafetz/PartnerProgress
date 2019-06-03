@@ -40,9 +40,6 @@ genPPR <- function(filepath_msd, output_global = TRUE, output_ctry_all = TRUE, d
   
   #import/open data
   	df_mer <- readr::read_rds(filepath_msd)
-
-  #reshape wide to match old MSD
-  	df_mer <- ICPIutilities::reshape_msd(df_mer, "wide")
   	
   #find current quarter & fy
   	curr_q  <- ICPIutilities::identifypd(df_mer, "quarter")
@@ -52,6 +49,9 @@ genPPR <- function(filepath_msd, output_global = TRUE, output_ctry_all = TRUE, d
   	
   #subset to indicators of interest
   	df_ppr <- filter_keyinds(df_mer, curr_q)
+
+  #reshape wide to match old MSD
+  	df_mer <- ICPIutilities::reshape_msd(df_mer, "wide")
   	
   #adjust prioritizations to represent current year targeting
   	df_ppr <- reprioritize(df_ppr)
