@@ -45,9 +45,9 @@ genPPR <- function(filepath_msd, output_global = TRUE, output_ctry_all = TRUE, d
   	df_mer <- ICPIutilities::reshape_msd(df_mer, "wide")
   	
   #find current quarter & fy
-  	curr_q  <- currentpd(df_mer, "quarter")
-  	curr_fy <- currentpd(df_mer, "year")
-  	fy_save <- currentpd(df_mer, "full") %>%
+  	curr_q  <- ICPIutilities::identifypd(df_mer, "quarter")
+  	curr_fy <- ICPIutilities::identifypd(df_mer, "year")
+  	fy_save <- ICPIutilities::identifypd(df_mer, "full") %>%
   	           toupper()
   	
   #subset to indicators of interest
