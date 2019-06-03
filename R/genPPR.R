@@ -50,6 +50,7 @@ genPPR <- function(filepath_msd, output_global = TRUE, output_ctry_all = TRUE, d
   #subset to indicators of interest
   	df_ppr <- filter_keyinds(df_mer, curr_q)
   	
+  	rm(df_mer)
   	
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
