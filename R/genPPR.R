@@ -69,10 +69,9 @@ genPPR <- function(filepath_msd, output_global = TRUE, output_ctry_all = TRUE, d
     df_ppr <- df_ppr %>%
       dplyr::group_by(operatingunit, countryname, psnu, psnuuid, snuprioritization,
                 fundingagency, primepartner, mechanismid, implementingmechanismname,
-                indicator, disagg) %>%
-      dplyr::summarize_at(dplyr::vars(dplyr::starts_with("fy")), ~ sum(., na.rm=TRUE)) %>%
+                indicator, disagg, fiscal_year) %>%
+      dplyr::summarize_at(dplyr::vars(targets:cumulative), sum, na.rm=TRUE) %>%
       dplyr::ungroup()
-  
     
   #reshape wide to match old MSD
     df_ppr <- ICPIutilities::reshape_msd(df_ppr, "wide")
