@@ -49,18 +49,7 @@ genPPR <- function(filepath_msd, output_global = TRUE, output_ctry_all = TRUE, d
   	
   #subset to indicators of interest
   	df_ppr <- filter_keyinds(df_mer, curr_q)
-
-  #reshape wide to match old MSD
-  	df_mer <- ICPIutilities::reshape_msd(df_mer, "wide")
   	
-  #adjust prioritizations to represent current year targeting
-  	df_ppr <- reprioritize(df_ppr)
-  	
-  #apply offical names before aggregating (since same mech id may have multiple partner/mech names)
-  	df_ppr <- ICPIutilities::rename_official(df_ppr)
-  
-  #include Net New targets (not included in DATIM)
-  	df_ppr <- include_nn_targets(df_ppr)
   	
   #clean up - create age/sex disagg & replace missing SNU prioritizations
     df_ppr <- df_ppr %>%
@@ -83,6 +72,19 @@ genPPR <- function(filepath_msd, output_global = TRUE, output_ctry_all = TRUE, d
       dplyr::summarize_at(dplyr::vars(dplyr::starts_with("fy")), ~ sum(., na.rm=TRUE)) %>%
       dplyr::ungroup()
   
+    
+  #reshape wide to match old MSD
+    df_ppr <- ICPIutilities::reshape_msd(df_ppr, "wide")
+    
+  #adjust prioritizations to represent current year targeting
+    df_ppr <- reprioritize(df_ppr)
+    
+  #apply offical names before aggregating (since same mech id may have multiple partner/mech names)
+    df_ppr <- ICPIutilities::rename_official(df_ppr)
+    
+  #include Net New targets (not included in DATIM)
+    df_ppr <- include_nn_targets(df_ppr)
+    
   #replace all 0's with NA
   	df_ppr[df_ppr==0] <- NA
   
