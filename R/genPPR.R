@@ -117,7 +117,7 @@ genPPR <- function(filepath_msd, output_global = TRUE, output_ctry_all = TRUE, d
   	if(!is.null(output_subset_type) && output_subset_type == "ou"){
   	  purrr::map(.x = group, .f = ~ export(df_ppr, .x, fy_save, folderpath_output))
   	} else if(!is.null(output_subset_type) && output_subset_type == "mechid"){
-  	  dplyr::filter(df_ppr, mechanismid %in% c(!!!group)) %>%
+  	  dplyr::filter(df_ppr, mech_code %in% c(!!!group)) %>%
   	    export("GLOBAL_SelectMechs", fy_save, folderpath_output)
   	}
   
