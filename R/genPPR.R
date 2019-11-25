@@ -9,7 +9,6 @@
 #' @param filepath_msd what is the file path to the MER Structured dataset? eg "~/ICPI/Data/MER_Structured_Dataset_OU_IM_FY17-19_20190517_v1_1.rds"
 #' @param output_global export full dataset? logical, default = TRUE
 #' @param output_ctry_all export each country? logicial, default = TRUE
-#' @param df_return return a dataframe in R session, default = FALSE
 #' @param folderpath_output where do you want the output saved?, default = "ExcelOutput"
 #' @param output_subset_type select only subset, either "ou" or "mechid"
 #' @param ... add list of countries or mechanisms for `output_subset_type`, eg "18841", "14421"
@@ -33,7 +32,7 @@
 #'   genPPR("~/ICPI/Data/MER_Structured_Dataset_OU_IM_FY17-19_20190517_v1_1.rds", output_global = FALSE, output_ctry_all = FALSE, folderpath_output = "ExcelOutput", output_subset_type = "mechid", "18234", "18544") }
 #'
 
-genPPR <- function(filepath_msd, output_global = TRUE, output_ctry_all = TRUE, df_return = FALSE, folderpath_output = "ExcelOutput", output_subset_type = NULL, ...){
+genPPR <- function(filepath_msd, folderpath_output = "ExcelOutput", output_global = TRUE, output_ctry_all = TRUE,  output_subset_type = NULL, ...){
 
   if(tools::file_ext(filepath_msd) != "rds")
     stop("File must be a rds file. From the ICPI/ICPIutilities repo, run read_msd()")
@@ -121,8 +120,6 @@ genPPR <- function(filepath_msd, output_global = TRUE, output_ctry_all = TRUE, d
   	    export("GLOBAL_SelectMechs", fy_save, folderpath_output)
   	}
   
-  	#output data frame
-  	if(df_return == TRUE) {
-  	  return(df_ppr)
-    }
+
+  	invisible(df_ppr)
 }

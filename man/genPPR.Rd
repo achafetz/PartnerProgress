@@ -4,20 +4,18 @@
 \alias{genPPR}
 \title{Generate PPR export data file}
 \usage{
-genPPR(filepath_msd, output_global = TRUE, output_ctry_all = TRUE,
-  df_return = FALSE, folderpath_output = "ExcelOutput",
+genPPR(filepath_msd, folderpath_output = "ExcelOutput",
+  output_global = TRUE, output_ctry_all = TRUE,
   output_subset_type = NULL, ...)
 }
 \arguments{
 \item{filepath_msd}{what is the file path to the MER Structured dataset? eg "~/ICPI/Data/MER_Structured_Dataset_OU_IM_FY17-19_20190517_v1_1.rds"}
 
+\item{folderpath_output}{where do you want the output saved?, default = "ExcelOutput"}
+
 \item{output_global}{export full dataset? logical, default = TRUE}
 
 \item{output_ctry_all}{export each country? logicial, default = TRUE}
-
-\item{df_return}{return a dataframe in R session, default = FALSE}
-
-\item{folderpath_output}{where do you want the output saved?, default = "ExcelOutput"}
 
 \item{output_subset_type}{select only subset, either "ou" or "mechid"}
 
