@@ -1,6 +1,6 @@
 Package: genPPR
 Title: PPR Dataset Generation
-Version: 2.0.1.9000
+Version: 2.0.2
 Authors@R: 
     person(given = "Aaron",
            family = "Chafetz",
